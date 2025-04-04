@@ -1,0 +1,162 @@
+/* General Styles */
+body.register-body {
+    background: linear-gradient(135deg, #28a745, #1d7a35);
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Register Card */
+.register-card {
+    max-width: 600px;
+    width: 100%;
+    border-radius: 20px;
+    background: #fff;
+    color: #333;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 2.5rem;
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(40, 167, 69, 0.1);
+}
+
+.register-logo {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+    transition: transform 0.3s ease;
+}
+
+.register-logo:hover {
+    transform: scale(1.05);
+}
+
+.register-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #28a745;
+    letter-spacing: 0.5px;
+}
+
+.register-card p {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+/* Form Fields */
+.register-card .form-label {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.register-card .form-control {
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+}
+
+.register-card .form-control:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.3);
+    background: #fff;
+}
+
+/* Buttons */
+.register-card .btn-success {
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.9rem;
+    transition: all 0.3s ease;
+    background: #28a745;
+    border: none;
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+}
+
+.register-card .btn-success:hover {
+    background: #1d7a35;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+}
+
+/* Links */
+.register-card a {
+    text-decoration: none;
+    color: #28a745;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.register-card a:hover {
+    color: #1d7a35;
+}
+
+/* Toggle Password Visibility */
+#togglePassword, #toggleConfirmPassword {
+    background: none;
+    border: none;
+    color: #28a745;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, color 0.3s ease;
+}
+
+#togglePassword:hover, #toggleConfirmPassword:hover {
+    color: #1d7a35;
+    transform: scale(1.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .register-card {
+        padding: 2rem;
+        max-width: 90%;
+    }
+
+    .register-card h3 {
+        font-size: 1.75rem;
+    }
+
+    .register-card p {
+        font-size: 0.9rem;
+    }
+
+    .register-logo {
+        width: 80px;
+    }
+
+    .register-card .btn-success {
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .row .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .register-card {
+        padding: 1.5rem;
+    }
+
+    .register-card h3 {
+        font-size: 1.5rem;
+    }
+
+    .register-card .form-control {
+        font-size: 0.9rem;
+        padding: 0.65rem 1rem;
+    }
+}
