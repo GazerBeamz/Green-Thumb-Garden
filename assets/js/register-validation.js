@@ -1,7 +1,23 @@
 function handleFormSubmit(event) {
   event.preventDefault(); // Prevent the form from submitting immediately
 
-  // Show SweetAlert
+  // Get the password and confirm password fields
+  const passwordField = document.querySelector("#password");
+  const confirmPasswordField = document.querySelector("#confirm_password");
+
+  // Check if passwords match
+  if (passwordField.value !== confirmPasswordField.value) {
+    // Show error SweetAlert if passwords do not match
+    Swal.fire({
+      icon: "error",
+      title: "Registration Failed",
+      text: "Passwords do not match!",
+      confirmButtonColor: "#28a745",
+    });
+    return false; // Stop form submission
+  }
+
+  // Show success SweetAlert if passwords match
   Swal.fire({
     icon: "success",
     title: "Registration Successful",

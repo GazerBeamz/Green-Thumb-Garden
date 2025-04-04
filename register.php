@@ -1,4 +1,3 @@
-<!-- filepath: c:\xampp\htdocs\greenthumb_garden\register.php -->
 <?php
 require_once 'includes/db.php';
 require 'vendor/autoload.php'; // Include PHPMailer via Composer
@@ -14,12 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
+    // Check if passwords match
     if ($password !== $confirm_password) {
         $error = "Passwords do not match!";
     } else {
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-        $query = "INSERT INTO users (firstname, middlename, lastname, email, password, role) 
-                  VALUES ('$firstname', '$middlename', '$lastname', '$email', '$hashed_password', 'customer')";
+        $query = "INSERT INTO users (firstname, middlename, lastname, email, password, username, role) 
+                  VALUES ('$firstname', '$middlename', '$lastname', '$email', '$hashed_password', '', 'customer')";
         if (mysqli_query($conn, $query)) {
             // Send email with PHPMailer
             $mail = new PHPMailer(true);
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 ";
 
                 $mail->send();
-                header("Location: login.php?success=1");
+                $success = true; // Set success flag
             } catch (Exception $e) {
                 $error = "Registration successful, but we couldn't send the email. Mailer Error: {$mail->ErrorInfo}";
             }
@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 confirmButtonColor: '#28a745'
             });
         </script>
-    <?php } elseif ($_SERVER['REQUEST_METHOD'] == 'POST' && !isset($error)) { ?>
+    <?php } elseif (isset($success) && $success) { ?>
         <script>
             Swal.fire({
                 icon: 'success',
@@ -105,24 +105,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <h3 class="fw-bold text-success">Create Your Account</h3>
                 <p class="text-muted">Join Green Thumb Garden and start your gardening journey today!</p>
             </div>
-            <form method="POST" onsubmit="return handleFormSubmit(event)">
-                <?php if (isset($error)) echo "<p class='text-danger text-center mb-3 animate__animated animate__shakeX'>$error</p>"; ?>
+            <form method="POST">
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="firstname" class="form-label">First Name</label>
-                        <input type="text" name="firstname" id="firstname" class="form-control" placeholder="John" required>
+                        <input type="text" name="firstname" id="firstname" class="form-control" placeholder="John" required value="<?php echo isset($_POST['firstname']) ? htmlspecialchars($_POST['firstname']) : ''; ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="middlename" class="form-label">Middle Name (Optional)</label>
-                        <input type="text" name="middlename" id="middlename" class="form-control" placeholder="Michael">
+                        <input type="text" name="middlename" id="middlename" class="form-control" placeholder="Michael" value="<?php echo isset($_POST['middlename']) ? htmlspecialchars($_POST['middlename']) : ''; ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="lastname" class="form-label">Last Name</label>
-                        <input type="text" name="lastname" id="lastname" class="form-control" placeholder="Doe" required>
+                        <input type="text" name="lastname" id="lastname" class="form-control" placeholder="Doe" required value="<?php echo isset($_POST['lastname']) ? htmlspecialchars($_POST['lastname']) : ''; ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" class="form-control" placeholder="example@example.com" required>
+                        <input type="email" name="email" id="email" class="form-control" placeholder="example@example.com" required value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="password" class="form-label">Password</label>
@@ -155,6 +154,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </div>
     </div>
     <script src="assets/js/view-password.js"></script>
-    <script src="assets/js/register-validation.js"></script>
 </body>
 </html>
