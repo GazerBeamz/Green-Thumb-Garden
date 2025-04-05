@@ -72,17 +72,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row">
             <!-- Profile Sidebar -->
             <div class="col-md-4 text-center">
-                <!-- Clickable Profile Image -->
+                <!-- Profile Image with Preview -->
                 <form method="POST" action="" enctype="multipart/form-data" id="profileForm">
                     <label for="profile_image" style="cursor: pointer;">
                         <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" 
                              alt="Profile Picture" 
                              class="img-fluid rounded-circle mb-3" 
+                             id="profileImagePreview"
                              style="width: 150px; border: 3px solid #2ecc71;">
                     </label>
-                    <input type="file" class="d-none" id="profile_image" name="profile_image" onchange="document.getElementById('profileForm').submit();">
+                    <input type="file" class="d-none" id="profile_image" name="profile_image" accept="image/*">
                     <h4 class="fw-bold"><?php echo htmlspecialchars($user['firstname'] . ' ' . $user['lastname']); ?></h4>
-                    <p class="text-muted"><?php echo htmlspecialchars($user['email']); ?></p>
             </div>
 
             <!-- Profile Form -->
@@ -120,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/customer-profilerendering.js"></script>
 </body>
 
 </html>
