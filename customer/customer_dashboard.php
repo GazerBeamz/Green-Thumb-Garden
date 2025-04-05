@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
 
 // Fetch user details
 $user_id = $_SESSION['user_id'];
-$query = "SELECT firstname, lastname FROM users WHERE id = '$user_id'";
+$query = "SELECT firstname, lastname, profile_image FROM users WHERE id = '$user_id'";
 $result = mysqli_query($conn, $query);
 $user = mysqli_fetch_assoc($result);
 $fullname = $user['firstname'] . ' ' . $user['lastname'];
@@ -55,10 +55,12 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
                     <button class="btn btn-success"><i class="bi bi-search"></i></button>
                 </div>
                 <div class="profile-container">
-                    <div class="profile-icon"><i class="bi bi-person-circle"></i></div>
+                    <div class="profile-icon">
+                        <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                    </div>
                     <div class="profile-hover">
                         <p class="fw-bold"><?php echo htmlspecialchars($fullname); ?></p>
-                        <a href="customer_profile.php"><i class="bi bi-pencil-square"></i> Update Profile</a>
+                        <a href="customer_profile.php"><i class="bi bi-pencil-square"></i> My Profile</a>
                         <a href="../logout.php" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
                     </div>
                 </div>
