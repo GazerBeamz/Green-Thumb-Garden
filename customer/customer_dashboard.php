@@ -17,6 +17,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +28,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/customer_dashboard.css">
 </head>
+
 <body>
     <!-- Sidebar -->
     <nav class="sidebar">
@@ -101,8 +103,8 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
             <div class="d-flex gap-3 flex-wrap">
                 <button class="btn btn-outline-success category-btn active" data-category="all">All Plants</button>
                 <button class="btn btn-outline-success category-btn" data-category="flower">Flowers</button>
-                <button class="btn btn-outline-success category-btn" data-category="vegetable">Vegetables</button>
-                <button class="btn btn-outline-success category-btn" data-category="herbs">Herbs</button>
+                <button class="btn btn-outline-success category-btn" data-category="vegetable">Vegetable</button>
+                <button class="btn btn-outline-success category-btn" data-category="herbs">Herb</button>
                 <button class="btn btn-outline-success category-btn" data-category="product">Miscellaneous</button>
             </div>
         </section>
@@ -110,7 +112,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
         <!-- Products Section -->
         <section class="products mb-5">
             <h4 class="fw-bold text-success mb-4 animate__animated animate__fadeIn">Products</h4>
-            <div class="row g-4" id="products-container">
+            <div class="grid-container" id="products-container">
                 <?php
                 // Path to the products folder
                 $productsFolder = '../assets/products/';
@@ -122,20 +124,24 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
                     if ($file !== '.' && $file !== '..') {
                         // Extract product name and category from the file name
                         $productName = pathinfo($file, PATHINFO_FILENAME);
-                        $productNameFormatted = ucwords(str_replace('_', ' ', $productName)); // Format name
+                        // Adjust the displayed name to remove plural forms
+                        $productNameFormatted = ucwords(str_replace('_', ' ', $productName));
+                        $productNameFormatted = str_replace('Vegetables', 'Vegetable', $productNameFormatted);
+                        $productNameFormatted = str_replace('Herbs', 'Herb', $productNameFormatted);
+                        $productNameFormatted = str_replace('Miscellaneous', 'Misc', $productNameFormatted);
                         $price = rand(300, 1000); // Random price for demonstration
 
                         // Assign category based on the file name prefix (e.g., 'flower', 'vegetable')
                         $category = strtolower(preg_replace('/\d+$/', '', $productName)); // Remove trailing numbers
-                        ?>
-                        <div class="col-md-3 product-item">
+                ?>
+                        <div class="product-item">
                             <div class="card" data-category="<?php echo htmlspecialchars($category); ?>">
                                 <img src="<?php echo $productsFolder . $file; ?>" alt="<?php echo htmlspecialchars($productNameFormatted); ?>" class="img-fluid">
                                 <h6><?php echo htmlspecialchars($productNameFormatted); ?></h6>
                                 <p>₱<?php echo number_format($price, 2); ?></p>
                             </div>
                         </div>
-                        <?php
+                <?php
                     }
                 }
                 ?>
@@ -146,4 +152,5 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/filter-products.js"></script>
 </body>
+
 </html>
