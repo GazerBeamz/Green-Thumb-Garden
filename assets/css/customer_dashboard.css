@@ -38,7 +38,7 @@ body {
     justify-content: center;
     gap: 12px;
     padding: 0 20px;
-    margin-bottom: 30px;
+    margin-bottom: 40px;
 }
 
 .sidebar img {
@@ -52,7 +52,7 @@ body {
 }
 
 .sidebar .logo-text {
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     font-weight: 600;
     letter-spacing: 0.5px;
     color: #fff;
@@ -71,8 +71,8 @@ body {
 }
 
 .sidebar a:hover {
-    background: rgba(255, 255, 255, 0.15);
-    padding-left: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    padding-left: 35px;
     border-radius: 0 25px 25px 0;
 }
 
@@ -107,6 +107,29 @@ body {
     margin-left: 0;
 }
 
+/* Header */
+header {
+    position: relative;
+    background: #e2e8f0;
+    border-radius: 20px;
+    padding: 30px 40px;
+    margin-bottom: 40px;
+    min-height: 150px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    overflow: visible; /* Change from hidden to visible */
+}
+
+header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 0;
+}
+
 /* Search Bar */
 .search-bar {
     max-width: 300px;
@@ -115,15 +138,17 @@ body {
 
 .search-bar input {
     border-radius: 25px;
-    padding: 10px 40px 10px 20px;
+    padding: 12px 40px 12px 20px;
     border: 1px solid #e2e8f0;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
+    font-size: 0.95rem;
+    background: #fff;
 }
 
 .search-bar input:focus {
     border-color: #2ecc71;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.1);
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
     outline: none;
 }
 
@@ -136,6 +161,7 @@ body {
     padding: 8px;
     background: #2ecc71;
     border: none;
+    color: #fff;
     transition: background 0.3s ease;
 }
 
@@ -143,133 +169,56 @@ body {
     background: #27ae60;
 }
 
-/* Cards (Recommendations and Products) */
-.card {
-    border: none;
-    border-radius: 16px;
-    background: #fff;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    overflow: hidden;
-    text-align: center;
-    padding: 15px;
-}
-
-.card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-}
-
-.card img {
-    border-radius: 12px;
-    max-height: 150px;
-    object-fit: cover;
-    width: 100%;
-}
-
-.card h6 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #2d3748;
-    margin: 10px 0 5px;
-}
-
-.card p {
-    font-size: 0.9rem;
-    color: #718096;
-}
-
-/* Recommendations Section */
-.recommendations .d-flex {
-    overflow-x: auto;
-    padding-bottom: 10px;
-    scrollbar-width: thin;
-    scrollbar-color: #2ecc71 #e2e8f0;
-}
-
-/* Categories Section */
-.categories .btn {
-    border-radius: 25px;
-    padding: 8px 20px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.categories .btn:hover {
-    background: #2ecc71;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
-}
-
-.category-btn.active {
-    background: #2ecc71;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
-}
-
-/* Products Section */
-#products-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 equal-width columns */
-    gap: 1rem; /* Consistent gap between cards */
-}
-
-.product-item {
-    transition: opacity 0.3s ease;
-}
-
-.product-item.hidden {
-    display: none; /* Completely remove hidden items from the layout */
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    #products-container {
-        grid-template-columns: repeat(2, 1fr); /* 2 cards per row on smaller screens */
-    }
-}
-
-@media (max-width: 576px) {
-    #products-container {
-        grid-template-columns: 1fr; /* 1 card per row on very small screens */
-    }
-}
-
 /* Profile Container */
 .profile-container {
     position: relative;
+    cursor: pointer;
+    overflow: visible;
+    z-index: 10000; /* Ensure it appears above other elements */
 }
 
-.profile-icon {
-    font-size: 2.2rem;
-    color: #2ecc71;
-    cursor: pointer;
+.profile-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #2ecc71;
     transition: transform 0.3s ease;
 }
 
-.profile-container:hover .profile-icon {
+.profile-container:hover .profile-icon img {
     transform: scale(1.1);
 }
 
+/* Dropdown Styles */
 .profile-hover {
     position: absolute;
-    top: 50px;
-    right: 0;
+    top: 50px; /* Position below the profile icon */
+    right: 50%; /* Align to the center of the profile icon */
+    transform: translateX(50%); /* Adjust to center */
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    display: none;
-    z-index: 1000;
+    display: none; /* Initially hidden */
+    opacity: 0;
+    visibility: hidden;
+    z-index: 9999; /* Ensure it appears above all other elements */
     min-width: 220px;
     border: 1px solid #e2e8f0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    transition-delay: 2s;
 }
 
-.profile-container:hover .profile-hover {
+/* Show dropdown on hover */
+.profile-container:hover .profile-hover,
+.profile-hover:hover {
     display: block;
+    opacity: 1;
+    visibility: visible;
 }
 
+/* Dropdown Links */
 .profile-hover p {
     font-size: 1rem;
     font-weight: 600;
@@ -293,6 +242,145 @@ body {
     color: #27ae60;
 }
 
+/* Section Titles */
+section h4 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2ecc71;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+section h4::after {
+    content: '';
+    width: 40px;
+    height: 3px;
+    background: #2ecc71;
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+}
+
+/* Cards (Recommendations and Products) */
+.card {
+    border: none;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    text-align: center;
+    padding: 15px;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(46, 204, 113, 0.2);
+}
+
+.card img {
+    border-radius: 12px;
+    max-height: 150px;
+    object-fit: cover;
+    width: 100%;
+    transition: transform 0.3s ease;
+}
+
+.card:hover img {
+    transform: scale(1.05);
+}
+
+.card h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 10px 0 5px;
+}
+
+.card p {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+/* Recommendations Section */
+.recommendations .d-flex {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #2ecc71 #e2e8f0;
+}
+
+.recommendations .card {
+    min-width: 200px;
+}
+
+/* Categories Section */
+.categories .btn {
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    border: 1px solid #2ecc71;
+    color: #2ecc71;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.categories .btn:hover {
+    background: #2ecc71;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+}
+
+.category-btn.active {
+    background: #2ecc71;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+}
+
+/* Products Section */
+#products-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.5rem;
+    position: relative;
+}
+
+.product-item {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.product-item.hidden {
+    display: none;
+}
+
+.product-item.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.no-products-message {
+    text-align: center;
+    font-size: 1rem;
+    color: #718096;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    margin-top: 20px;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
     .sidebar {
@@ -304,6 +392,10 @@ body {
     }
     .search-bar {
         max-width: 250px;
+    }
+    header {
+        min-height: 120px;
+        padding: 20px 30px;
     }
 }
 
@@ -339,10 +431,19 @@ body {
     .recommendations .d-flex {
         flex-wrap: nowrap;
     }
+
+    header {
+        min-height: 100px;
+        padding: 15px 20px;
+    }
+
+    header h1 {
+        font-size: 1.8rem;
+    }
 }
 
 @media (max-width: 576px) {
-    h1 {
+    header h1 {
         font-size: 1.6rem;
     }
     .card img {
@@ -357,5 +458,13 @@ body {
     .profile-hover {
         min-width: 180px;
         top: 40px;
+    }
+    .categories .btn {
+        padding: 6px 15px;
+        font-size: 0.9rem;
+    }
+    header {
+        min-height: 80px;
+        padding: 10px 15px;
     }
 }

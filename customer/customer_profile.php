@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Settings - Green Thumb Garden</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/customer_profile.css">
 </head>
 
@@ -71,49 +72,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="container mt-5">
         <div class="row">
             <!-- Profile Sidebar -->
-            <div class="col-md-4 text-center">
-                <!-- Profile Image with Preview -->
-                <form method="POST" action="" enctype="multipart/form-data" id="profileForm">
-                    <label for="profile_image" style="cursor: pointer;">
-                        <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" 
-                             alt="Profile Picture" 
-                             class="img-fluid rounded-circle mb-3" 
-                             id="profileImagePreview"
-                             style="width: 150px; border: 3px solid #2ecc71;">
-                    </label>
-                    <input type="file" class="d-none" id="profile_image" name="profile_image" accept="image/*">
-                    <h4 class="fw-bold"><?php echo htmlspecialchars($user['firstname'] . ' ' . $user['lastname']); ?></h4>
+            <div class="col-md-4 profile-sidebar">
+                <div class="profile-image-wrapper">
+                    <form method="POST" action="" enctype="multipart/form-data" id="profileForm">
+                        <label for="profile_image">
+                            <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" 
+                                 alt="Profile Picture" 
+                                 id="profileImagePreview">
+                            <span class="upload-icon"><i class="fas fa-camera"></i></span>
+                        </label>
+                        <input type="file" id="profile_image" name="profile_image" accept="image/*">
+                </div>
+                <h4><?php echo htmlspecialchars($user['firstname'] . ' ' . $user['lastname']); ?></h4>
+                <p class="text-muted"><?php echo htmlspecialchars($user['email']); ?></p>
             </div>
 
             <!-- Profile Form -->
             <div class="col-md-8">
-                <h3 class="fw-bold text-success mb-4">Profile Settings</h3>
+                <h3>Profile Settings</h3>
                 <?php if (isset($successMessage)): ?>
-                    <div class="alert alert-success"><?php echo $successMessage; ?></div>
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i> <?php echo $successMessage; ?>
+                    </div>
                 <?php elseif (isset($errorMessage)): ?>
-                    <div class="alert alert-danger"><?php echo $errorMessage; ?></div>
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i> <?php echo $errorMessage; ?>
+                    </div>
                 <?php endif; ?>
 
-                    <div class="row mb-3">
-                        <div class="col">
-                            <label for="firstname" class="form-label">First Name</label>
-                            <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($user['firstname']); ?>" required>
-                        </div>
-                        <div class="col">
-                            <label for="lastname" class="form-label">Last Name</label>
-                            <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($user['lastname']); ?>" required>
-                        </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="firstname" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="firstname" name="firstname" value="<?php echo htmlspecialchars($user['firstname']); ?>" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+                    <div class="col-md-6">
+                        <label for="lastname" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastname" name="lastname" value="<?php echo htmlspecialchars($user['lastname']); ?>" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
-                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" value="<?php echo htmlspecialchars($user['username']); ?>" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
+                </div>
+                <div class="d-flex gap-3">
                     <button type="submit" class="btn btn-success">Save Profile</button>
                     <a href="customer_dashboard.php" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
                 </form>
             </div>
         </div>

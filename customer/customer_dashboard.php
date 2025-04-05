@@ -44,10 +44,10 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
     <!-- Main Content -->
     <main class="content">
         <!-- Header -->
-        <header class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+        <header class="d-flex justify-content-between align-items-center flex-wrap gap-3">
             <div class="d-flex align-items-center gap-3">
                 <button class="hamburger"><i class="bi bi-list"></i></button>
-                <h1 class="fw-bold text-success animate__animated animate__fadeIn">Explore Your Gardening Journey</h1>
+                <h1 class="animate__animated animate__fadeIn">Explore Your Gardening Journey</h1>
             </div>
             <div class="d-flex align-items-center gap-3">
                 <div class="search-bar">
@@ -56,7 +56,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
                 </div>
                 <div class="profile-container">
                     <div class="profile-icon">
-                        <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;">
+                        <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" alt="Profile" class="rounded-circle">
                     </div>
                     <div class="profile-hover">
                         <p class="fw-bold"><?php echo htmlspecialchars($fullname); ?></p>
@@ -69,8 +69,8 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
         <!-- Recommendations -->
         <section class="recommendations mb-5">
-            <h4 class="fw-bold text-success mb-4 animate__animated animate__fadeIn">Recommendations</h4>
-            <div class="d-flex gap-4 flex-wrap">
+            <h4 class="animate__animated animate__fadeIn">Recommendations</h4>
+            <div class="d-flex gap-4">
                 <div class="card animate__animated animate__zoomIn">
                     <img src="../assets/products/product.jpg" alt="Product 1" class="img-fluid">
                     <h6>Product 1</h6>
@@ -101,7 +101,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
         <!-- Categories -->
         <section class="categories mb-5">
-            <h4 class="fw-bold text-success mb-4 animate__animated animate__fadeIn">Categories</h4>
+            <h4 class="animate__animated animate__fadeIn">Categories</h4>
             <div class="d-flex gap-3 flex-wrap">
                 <button class="btn btn-outline-success category-btn active" data-category="all">All Plants</button>
                 <button class="btn btn-outline-success category-btn" data-category="flower">Flowers</button>
@@ -113,7 +113,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
         <!-- Products Section -->
         <section class="products mb-5">
-            <h4 class="fw-bold text-success mb-4 animate__animated animate__fadeIn">Products</h4>
+            <h4 class="animate__animated animate__fadeIn">Products</h4>
             <div class="grid-container" id="products-container">
                 <?php
                 // Path to the products folder
