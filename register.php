@@ -41,15 +41,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $mail->isHTML(true);
                 $mail->Subject = 'Welcome to Green Thumb Garden!';
                 $mail->Body = "
-                    <h3>Hello $firstname,</h3>
-                    <p>Thank you for registering at Green Thumb Garden.</p>
-                    <p>Your login details are:</p>
-                    <ul>
-                        <li><strong>Email:</strong> $email</li>
-                        <li><strong>Password:</strong> $password</li>
-                    </ul>
-                    <p>Please keep this information secure.</p>
-                    <p>Best regards,<br>Green Thumb Garden Team</p>
+                    <div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333;'>
+                        <h3 style='color: #28a745;'>Hello $firstname,</h3>
+                        <p>Thank you for registering at <strong>Green Thumb Garden</strong>.</p>
+                        <p>Your login details are:</p>
+                        <table style='border-collapse: collapse; width: 100%; max-width: 400px;'>
+                            <tr>
+                                <td style='padding: 8px; border: 1px solid #ddd;'><strong>Email:</strong></td>
+                                <td style='padding: 8px; border: 1px solid #ddd;'>$email</td>
+                            </tr>
+                            <tr>
+                                <td style='padding: 8px; border: 1px solid #ddd;'><strong>Password:</strong></td>
+                                <td style='padding: 8px; border: 1px solid #ddd;'>$password</td>
+                            </tr>
+                        </table>
+                        <p style='margin-top: 20px;'>Please keep this information secure.</p>
+                        <p style='margin-top: 20px;'>Best regards,<br><strong>Green Thumb Garden Team</strong></p>
+                    </div>
                 ";
 
                 $mail->send();

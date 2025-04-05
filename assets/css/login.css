@@ -154,6 +154,21 @@ body.login-body::before {
     color: var(--dark-green);
     transform: scale(1.1);
 }
+
+/* Forgot Password Link */
+.forgot-password-link {
+    font-size: 1rem;
+    text-decoration: none;
+    color: var(--primary-green);
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.forgot-password-link:hover {
+    color: var(--dark-green);
+    text-decoration: underline;
+    transform: translateY(-2px);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .login-card {

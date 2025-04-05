@@ -1,0 +1,346 @@
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f0f7f4, #e6eef5);
+    min-height: 100vh;
+    overflow-x: hidden;
+    color: #2d3748;
+}
+
+/* Sidebar */
+.sidebar {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    background: linear-gradient(180deg, #2ecc71, #27ae60);
+    color: #fff;
+    padding: 30px 0;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+    box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar.active {
+    transform: translateX(0);
+}
+
+.sidebar .logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 0 20px;
+    margin-bottom: 30px;
+}
+
+.sidebar img {
+    max-width: 40px;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar img:hover {
+    transform: scale(1.1);
+}
+
+.sidebar .logo-text {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #fff;
+}
+
+.sidebar a {
+    color: #fff;
+    text-decoration: none;
+    padding: 14px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.sidebar a:hover {
+    background: rgba(255, 255, 255, 0.15);
+    padding-left: 30px;
+    border-radius: 0 25px 25px 0;
+}
+
+.sidebar a i {
+    font-size: 1.3rem;
+}
+
+/* Hamburger Menu */
+.hamburger {
+    display: none;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+    color: #2ecc71;
+    cursor: pointer;
+    padding: 10px;
+    transition: transform 0.3s ease;
+}
+
+.hamburger:hover {
+    transform: rotate(90deg);
+}
+
+/* Main Content */
+.content {
+    margin-left: 260px;
+    padding: 40px;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.content.expanded {
+    margin-left: 0;
+}
+
+/* Search Bar */
+.search-bar {
+    max-width: 300px;
+    position: relative;
+}
+
+.search-bar input {
+    border-radius: 25px;
+    padding: 10px 40px 10px 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.search-bar input:focus {
+    border-color: #2ecc71;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.1);
+    outline: none;
+}
+
+.search-bar button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    padding: 8px;
+    background: #2ecc71;
+    border: none;
+    transition: background 0.3s ease;
+}
+
+.search-bar button:hover {
+    background: #27ae60;
+}
+
+/* Cards (Recommendations and Products) */
+.card {
+    border: none;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    text-align: center;
+    padding: 15px;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+    border-radius: 12px;
+    max-height: 150px;
+    object-fit: cover;
+    width: 100%;
+}
+
+.card h6 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 10px 0 5px;
+}
+
+.card p {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+/* Recommendations Section */
+.recommendations .d-flex {
+    overflow-x: auto;
+    padding-bottom: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: #2ecc71 #e2e8f0;
+}
+
+/* Categories Section */
+.categories .btn {
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.categories .btn:hover {
+    background: #2ecc71;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+}
+
+.category-btn.active {
+    background: #2ecc71;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
+}
+
+/* Products Section */
+.product-item {
+    transition: opacity 0.3s ease;
+}
+
+.product-item.hidden {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Profile Container */
+.profile-container {
+    position: relative;
+}
+
+.profile-icon {
+    font-size: 2.2rem;
+    color: #2ecc71;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.profile-container:hover .profile-icon {
+    transform: scale(1.1);
+}
+
+.profile-hover {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    display: none;
+    z-index: 1000;
+    min-width: 220px;
+    border: 1px solid #e2e8f0;
+}
+
+.profile-container:hover .profile-hover {
+    display: block;
+}
+
+.profile-hover p {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.profile-hover a {
+    text-decoration: none;
+    color: #2ecc71;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    transition: color 0.3s ease;
+}
+
+.profile-hover a:hover {
+    color: #27ae60;
+}
+
+/* Responsive Design */
+@media (max-width: 992px) {
+    .sidebar {
+        width: 220px;
+    }
+    .content {
+        margin-left: 220px;
+        padding: 30px;
+    }
+    .search-bar {
+        max-width: 250px;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        padding: 20px 0;
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .content {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .hamburger {
+        display: block;
+    }
+
+    .search-bar {
+        max-width: 100%;
+        margin-top: 15px;
+    }
+
+    .recommendations .d-flex {
+        flex-wrap: nowrap;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.6rem;
+    }
+    .card img {
+        max-height: 120px;
+    }
+    .card h6 {
+        font-size: 0.9rem;
+    }
+    .card p {
+        font-size: 0.85rem;
+    }
+    .profile-hover {
+        min-width: 180px;
+        top: 40px;
+    }
+}
