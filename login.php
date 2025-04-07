@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['role'] = $user['role'];
-        if ($user['role'] == 'admin') header("Location: admin/index.php");
+        if ($user['role'] == 'admin') header("Location: admin/admin_dashboard.php");
         elseif ($user['role'] == 'employee') header("Location: employee/index.php");
         else header("Location: customer/customer_dashboard.php");
     } else {
