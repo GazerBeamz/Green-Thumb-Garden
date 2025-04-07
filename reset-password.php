@@ -55,9 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 $update_stmt->bind_param('si', $hashed_password, $user['id']);
                 $update_stmt->execute();
 
-                // Redirect to login page after successful password reset
+                // Redirect to login.php with a success flag
                 header("Location: login.php?success=1");
-                exit;
+                exit; // Stop further script execution
             } else {
                 $error = "Invalid or expired token.";
             }
