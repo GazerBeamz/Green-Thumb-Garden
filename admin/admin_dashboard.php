@@ -147,21 +147,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
 
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <aside class="sidebar">
         <div class="logo-container text-center py-4">
             <img src="../assets/images/logo.png" alt="Logo" class="logo-img">
             <h4 class="logo-text mt-2">Admin Dashboard</h4>
         </div>
-        <nav class="nav flex-column">
-            <a href="admin_dashboard.php" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="#manage-employees" class="nav-link"><i class="fas fa-users"></i> Manage Employees</a>
-            <a href="#manage-customers" class="nav-link"><i class="fas fa-user-friends"></i> Manage Customers</a>
-            <a href="#actions" class="nav-link"><i class="fas fa-tasks"></i> Actions</a>
+        <nav>
+            <ul class="nav flex-column">
+                <li><a href="admin_dashboard.php" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="#manage-employees" class="nav-link"><i class="fas fa-users"></i> Manage Employees</a></li>
+                <li><a href="#manage-customers" class="nav-link"><i class="fas fa-user-friends"></i> Manage Customers</a></li>
+                <li><a href="#actions" class="nav-link"><i class="fas fa-tasks"></i> Actions</a></li>
+            </ul>
         </nav>
-    </div>
+    </aside>
 
     <!-- Main Content -->
-    <div class="content">
+    <main class="content">
         <header class="d-flex justify-content-between align-items-center py-3 px-4 shadow-sm">
             <h1 class="text-primary">Welcome, <?php echo htmlspecialchars($user['firstname']); ?></h1>
             <div class="d-flex align-items-center gap-3">
@@ -179,6 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                             <!-- Employee list will be dynamically loaded here -->
                         </div>
                     </div>
+
                     <div id="chat-box" class="chat-box d-none">
                         <div class="chat-header">
                             <button id="chat-back" class="btn btn-sm btn-secondary me-2">Back</button>
@@ -196,6 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                             </div>
                         </form>
                     </div>
+
                 </div>
                 <div class="profile-container">
                     <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" alt="Admin Profile" class="profile-img">
@@ -317,7 +321,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                 </tbody>
             </table>
         </section>
-    </div>
+    </main>
 
     <!-- Add Employee Modal -->
     <div class="modal fade" id="addEmployeeModal" tabindex="-1" aria-labelledby="addEmployeeModalLabel" aria-hidden="true">
@@ -378,161 +382,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatToggle = document.getElementById('chat-toggle');
-            const chatList = document.getElementById('chat-list');
-            const chatBox = document.getElementById('chat-box');
-            const chatClose = document.getElementById('chat-close');
-            const chatCloseBox = document.getElementById('chat-close-box');
-            const chatBack = document.getElementById('chat-back');
-            const chatEmployees = document.getElementById('chat-employees');
-            const chatMessages = document.getElementById('chat-messages');
-            const chatForm = document.getElementById('chat-form');
-            const chatNotification = document.getElementById('chat-notification');
-            let currentRecipientId = null;
-
-            // Toggle chat list visibility
-            chatToggle.addEventListener('click', () => {
-                chatList.classList.toggle('d-none');
-                chatBox.classList.add('d-none');
-                if (!chatList.classList.contains('d-none')) {
-                    chatNotification.classList.remove('active');
-                    markMessagesAsRead();
-                    loadEmployeeChats();
-                }
-            });
-
-            chatClose.addEventListener('click', () => {
-                chatList.classList.add('d-none');
-            });
-
-            chatCloseBox.addEventListener('click', () => {
-                chatBox.classList.add('d-none');
-                chatList.classList.remove('d-none');
-            });
-
-            chatBack.addEventListener('click', () => {
-                chatBox.classList.add('d-none');
-                chatList.classList.remove('d-none');
-            });
-
-            // Load employee chats
-            function loadEmployeeChats() {
-                fetch('../fetch_employee_chats.php')
-                    .then(response => response.json())
-                    .then(data => {
-                        chatEmployees.innerHTML = '';
-                        data.forEach(employee => {
-                            const employeeDiv = document.createElement('div');
-                            employeeDiv.className = 'chat-employee';
-                            employeeDiv.innerHTML = `
-                                <img src="../assets/profiles/${employee.profile_image || 'profile-placeholder.png'}" alt="Profile">
-                                <div class="employee-info">
-                                    <div class="employee-name">${employee.firstname} ${employee.lastname}</div>
-                                    <div class="latest-message">${employee.latest_message || 'No messages yet'}</div>
-                                </div>
-                            `;
-                            employeeDiv.addEventListener('click', () => openChat(employee.id));
-                            chatEmployees.appendChild(employeeDiv);
-                        });
-                    })
-                    .catch(error => console.error('Error fetching employee chats:', error));
-            }
-
-            // Open chat with selected employee
-            function openChat(employeeId) {
-                currentRecipientId = employeeId;
-                document.getElementById('recipient-id').value = employeeId;
-                chatList.classList.add('d-none');
-                chatBox.classList.remove('d-none');
-                fetchMessages();
-            }
-
-            // Fetch messages
-            function fetchMessages() {
-                if (!currentRecipientId) return;
-                fetch(`../fetch_messages.php?user_id=${<?php echo $_SESSION['user_id']; ?>}&recipient_id=${currentRecipientId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        chatMessages.innerHTML = '';
-                        if (data.messages) {
-                            data.messages.forEach(msg => {
-                                const messageDiv = document.createElement('div');
-                                messageDiv.className = msg.isSender ? 'admin-message-container' : 'employee-message-container';
-                                messageDiv.innerHTML = `
-                        ${!msg.isSender ? `<img src="../assets/profiles/${msg.profile_image || 'profile-placeholder.png'}" alt="Profile" class="message-profile-img">` : ''}
-                        <div class="${msg.isSender ? 'admin-message' : 'employee-message'}">
-                            <p>${msg.message}</p>
-                        </div>
-                    `;
-                                chatMessages.appendChild(messageDiv);
-                            });
-                            chatMessages.scrollTop = chatMessages.scrollHeight;
-                        }
-                    })
-                    .catch(error => console.error('Fetch error:', error));
-            }
-
-            // Send message
-            chatForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(chatForm);
-
-                fetch('admin_dashboard.php', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            fetchMessages();
-                            document.getElementById('chat-input').value = '';
-                        } else {
-                            console.error('Error:', data.message);
-                        }
-                    })
-                    .catch(error => console.error('Fetch error:', error));
-            });
-
-            // Poll for new messages
-            setInterval(() => {
-                if (!chatBox.classList.contains('d-none')) {
-                    fetchMessages();
-                } else if (chatList.classList.contains('d-none')) {
-                    checkNewMessages();
-                }
-            }, 5000);
-
-            function markMessagesAsRead() {
-                fetch('../mark_messages_read.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `user_id=${<?php echo $_SESSION['user_id']; ?>}`
-                });
-            }
-
-            function checkNewMessages() {
-                fetch('../check_new_messages.php?user_id=<?php echo $_SESSION['user_id']; ?>')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.hasNewMessages && chatList.classList.contains('d-none')) {
-                            chatNotification.classList.add('active');
-                        }
-                    });
-            }
-
-            checkNewMessages();
-        });
-
-        window.showActionModal = function(userId, action) {
-            document.getElementById('actionUserId').value = userId;
-            document.getElementById('actionType').value = action;
-            const modal = new bootstrap.Modal(document.getElementById('actionModal'));
-            modal.show();
-        };
+        // Pass the user ID to JavaScript
+        window.currentUserId = <?php echo json_encode($_SESSION['user_id']); ?>;
     </script>
+    <script src="../assets/js/admin-message.js"></script>
 </body>
 
 </html>
