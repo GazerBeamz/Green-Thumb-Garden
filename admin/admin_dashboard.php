@@ -154,9 +154,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
         </div>
         <nav>
             <ul class="nav flex-column">
-                <li><a href="admin_dashboard.php" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                <li><a href="#manage-employees" class="nav-link"><i class="fas fa-users"></i> Manage Employees</a></li>
-                <li><a href="#manage-customers" class="nav-link"><i class="fas fa-user-friends"></i> Manage Customers</a></li>
+                <li><a href="admin_dashboard.php" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                <li><a href="manage_users.php" class="nav-link"><i class="fas fa-user-friends"></i> Manage Users</a></li>
                 <li><a href="#actions" class="nav-link"><i class="fas fa-tasks"></i> Actions</a></li>
             </ul>
         </nav>
@@ -249,8 +248,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             </div>
         </section>
 
-        <!-- Manage Employees -->
-        <section id="manage-employees" class="py-4 px-4">
+        
+        <!-- <section id="manage-employees" class="py-4 px-4">
             <h4 class="section-title">Manage Employees</h4>
             <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">Add Employee</button>
             <?php if (isset($successMessage)) echo "<p class='alert alert-success'>$successMessage</p>"; ?>
@@ -287,7 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             </table>
         </section>
 
-        <!-- Manage Customers -->
+        
         <section id="manage-customers" class="py-4 px-4">
             <h4 class="section-title">Manage Customers</h4>
             <table class="table table-striped table-hover">
@@ -320,7 +319,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                     ?>
                 </tbody>
             </table>
-        </section>
+        </section> -->
     </main>
 
     <!-- Add Employee Modal -->
