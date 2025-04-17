@@ -1,7 +1,136 @@
 <?php
-// Include database connection and authentication checks
 require_once '../includes/db.php';
-// Add authentication logic to ensure only admins can access this page
+require '../vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header("Location: ../login.php");
+    exit();
+}
+
+$user = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM users WHERE id = '{$_SESSION['user_id']}'"));
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message']) && isset($_POST['ajax'])) {
+    $recipientId = intval($_POST['recipient_id']);
+    $message = mysqli_real_escape_string($conn, $_POST['message']);
+    $senderId = $_SESSION['user_id'];
+
+    $query = "INSERT INTO messages (sender_id, recipient_id, message, is_read) VALUES ($senderId, $recipientId, '$message', 0)";
+    if (mysqli_query($conn, $query)) {
+        echo json_encode(['status' => 'success', 'message' => htmlspecialchars($message), 'isAdmin' => true]);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => mysqli_error($conn)]);
+    }
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_employee') {
+    $firstname = mysqli_real_escape_string($conn, $_POST['firstname']);
+    $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $password = $_POST['password'];
+    $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+
+    $query = "INSERT INTO users (firstname, lastname, email, password, role) VALUES ('$firstname', '$lastname', '$email', '$hashedPassword', 'employee')";
+    if (mysqli_query($conn, $query)) {
+        $successMessage = "Employee created successfully!";
+        $mail = new PHPMailer(true);
+        try {
+            $mail->isSMTP();
+            $mail->Host = 'smtp.gmail.com';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'brandonkylerojas1@gmail.com';
+            $mail->Password = 'yhtq gtsf byxj kyde';
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port = 587;
+            $mail->setFrom('your-email@gmail.com', 'Green Thumb Garden');
+            $mail->addAddress($email);
+            $mail->isHTML(true);
+            $mail->Subject = 'Welcome to Green Thumb Garden';
+            $mail->Body = "
+                    <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #ffffff;'>
+                        <div style='text-align: center; padding: 20px; background-color: #007bff; color: #ffffff; border-radius: 10px 10px 0 0;'>
+                            <h2 style='margin: 0;'>Welcome to Green Thumb Garden</h2>
+                        </div>
+                        <div style='padding: 20px; text-align: left;'>
+                            <p style='font-size: 16px; color: #333;'>Hello $firstname $lastname,</p>
+                            <p style='font-size: 16px; color: #333;'>You have been added as an employee. Your credentials:</p>
+                            <p style='font-size: 16px; color: #333;'><strong>Email:</strong> $email</p>
+                            <p style='font-size: 16px; color: #333;'><strong>Password:</strong> $password</p>
+                            <p style='font-size: 14px; color: #666;'>Please log in and change your password ASAP.</p>
+                        </div>
+                    </div>
+                ";
+            $mail->send();
+        } catch (Exception $e) {
+            $errorMessage = "Employee created, but email failed: " . $mail->ErrorInfo;
+        }
+    } else {
+        $errorMessage = "Failed to create employee: " . mysqli_error($conn);
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array($_POST['action'], ['deactivate', 'activate', 'delete'])) {
+    $userId = intval($_POST['user_id']);
+    $reason = mysqli_real_escape_string($conn, $_POST['reason'] ?? '');
+
+    if ($_POST['action'] === 'deactivate') {
+        $query = "UPDATE users SET status = 'inactive', deactivation_reason = '$reason' WHERE id = $userId";
+        if (mysqli_query($conn, $query)) {
+            $message = "Your account has been deactivated. Reason: $reason";
+            $query = "INSERT INTO messages (sender_id, recipient_id, message, is_read) VALUES ({$_SESSION['user_id']}, $userId, '$message', 0)";
+            mysqli_query($conn, $query);
+            $successMessage = "Account deactivated successfully!";
+        } else {
+            $errorMessage = "Failed to deactivate account: " . mysqli_error($conn);
+        }
+    } elseif ($_POST['action'] === 'activate') {
+        $query = "UPDATE users SET status = 'active', deactivation_reason = NULL WHERE id = $userId";
+        if (mysqli_query($conn, $query)) {
+            $successMessage = "Account activated successfully!";
+        } else {
+            $errorMessage = "Failed to activate account: " . mysqli_error($conn);
+        }
+    } elseif ($_POST['action'] === 'delete') {
+        $result = mysqli_query($conn, "SELECT email FROM users WHERE id = $userId");
+        $user = mysqli_fetch_assoc($result);
+        $email = $user['email'];
+
+        $query = "DELETE FROM users WHERE id = $userId";
+        if (mysqli_query($conn, $query)) {
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'your-email@gmail.com';
+                $mail->Password = 'your-email-password';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+                $mail->setFrom('your-email@gmail.com', 'Green Thumb Garden');
+                $mail->addAddress($email);
+                $mail->isHTML(true);
+                $mail->Subject = 'Account Deletion Notification';
+                $mail->Body = "<p>Your account has been deleted. Reason: $reason</p>";
+                $mail->send();
+            } catch (Exception $e) {
+                $errorMessage = "Account deleted, but email failed: " . $mail->ErrorInfo;
+            }
+            $successMessage = "Account deleted successfully!";
+        } else {
+            $errorMessage = "Failed to delete account: " . mysqli_error($conn);
+        }
+    }
+
+    if (!empty($reason) && in_array($_POST['action'], ['deactivate', 'delete'])) {
+        $logQuery = "INSERT INTO account_logs (user_id, action, reason) VALUES ($userId, '{$_POST['action']}', '$reason')";
+        mysqli_query($conn, $logQuery);
+    }
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -12,8 +141,8 @@ require_once '../includes/db.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Green Thumb Garden</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="../assets/css/admin_dashboard.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
@@ -24,26 +153,55 @@ require_once '../includes/db.php';
             <h4 class="logo-text mt-2">Admin Dashboard</h4>
         </div>
         <nav class="nav flex-column">
-            <a href="#dashboard" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="admin_dashboard.php" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="#manage-employees" class="nav-link"><i class="fas fa-users"></i> Manage Employees</a>
             <a href="#manage-customers" class="nav-link"><i class="fas fa-user-friends"></i> Manage Customers</a>
-            <a href="#messages" class="nav-link"><i class="fas fa-envelope"></i> Messages</a>
             <a href="#actions" class="nav-link"><i class="fas fa-tasks"></i> Actions</a>
-            <a href="../logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </nav>
     </div>
 
     <!-- Main Content -->
     <div class="content">
         <header class="d-flex justify-content-between align-items-center py-3 px-4 shadow-sm">
-            <h1 class="text-primary">Welcome, Admin</h1>
+            <h1 class="text-primary">Welcome, <?php echo htmlspecialchars($user['firstname']); ?></h1>
             <div class="d-flex align-items-center gap-3">
-                <!-- Profile Container -->
+                <div id="chat-head" class="chat-head position-static">
+                    <button id="chat-toggle" class="btn btn-primary position-relative">
+                        <i class="fas fa-comments"></i>
+                        <span id="chat-notification" class="chat-notification"></span>
+                    </button>
+                    <div id="chat-list" class="chat-list d-none">
+                        <div class="chat-header">
+                            <h6>Messages</h6>
+                            <button id="chat-close" class="btn btn-sm btn-danger">×</button>
+                        </div>
+                        <div id="chat-employees" class="chat-employees">
+                            <!-- Employee list will be dynamically loaded here -->
+                        </div>
+                    </div>
+                    <div id="chat-box" class="chat-box d-none">
+                        <div class="chat-header">
+                            <button id="chat-back" class="btn btn-sm btn-secondary me-2">Back</button>
+                            <button id="chat-close-box" class="btn btn-sm btn-danger">×</button>
+                        </div>
+                        <div id="chat-messages" class="chat-messages">
+                            <!-- Messages will be dynamically loaded here -->
+                        </div>
+                        <form id="chat-form" method="POST">
+                            <input type="hidden" name="recipient_id" id="recipient-id">
+                            <input type="hidden" name="ajax" value="1">
+                            <div class="input-group">
+                                <input type="text" name="message" id="chat-input" class="form-control" placeholder="Type a message..." required>
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <div class="profile-container">
                     <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" alt="Admin Profile" class="profile-img">
                     <div class="profile-hover">
-                        <p>Admin Name</p>
-                        <a href="admin_profile.php"><i class="fas fa-user"></i> My Profile</a>
+                        <p><?php echo htmlspecialchars($user['firstname'] . ' ' . $user['lastname']); ?></p>
+                        <a href="../profile.php"><i class="fas fa-user"></i> My Profile</a>
                         <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </div>
                 </div>
@@ -57,13 +215,25 @@ require_once '../includes/db.php';
                 <div class="col-md-4">
                     <div class="card shadow-sm text-center p-4">
                         <h6>Total Employees</h6>
-                        <p class="display-6 text-primary">50</p>
+                        <p class="display-6 text-primary">
+                            <?php
+                            $result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'employee'");
+                            $row = mysqli_fetch_assoc($result);
+                            echo $row['total'];
+                            ?>
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card shadow-sm text-center p-4">
                         <h6>Total Customers</h6>
-                        <p class="display-6 text-success">200</p>
+                        <p class="display-6 text-success">
+                            <?php
+                            $result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role = 'customer'");
+                            $row = mysqli_fetch_assoc($result);
+                            echo $row['total'];
+                            ?>
+                        </p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -79,28 +249,34 @@ require_once '../includes/db.php';
         <section id="manage-employees" class="py-4 px-4">
             <h4 class="section-title">Manage Employees</h4>
             <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">Add Employee</button>
+            <?php if (isset($successMessage)) echo "<p class='alert alert-success'>$successMessage</p>"; ?>
+            <?php if (isset($errorMessage)) echo "<p class='alert alert-danger'>$errorMessage</p>"; ?>
             <table class="table table-striped table-hover">
                 <thead class="table-dark">
                     <tr>
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Fetch and display employees from the database -->
                     <?php
-                    $result = mysqli_query($conn, "SELECT * FROM employees");
+                    $result = mysqli_query($conn, "SELECT * FROM users WHERE role = 'employee'");
                     while ($row = mysqli_fetch_assoc($result)) {
+                        $status = isset($row['status']) ? ucfirst($row['status']) : 'Unknown';
                         echo "<tr>
-                                <td>{$row['id']}</td>
-                                <td>{$row['name']}</td>
-                                <td>{$row['email']}</td>
-                                <td>
-                                    <button class='btn btn-danger btn-sm' onclick='removeEmployee({$row['id']})'>Remove</button>
-                                </td>
-                              </tr>";
+                                    <td>{$row['id']}</td>
+                                    <td>{$row['firstname']} {$row['lastname']}</td>
+                                    <td>{$row['email']}</td>
+                                    <td>$status</td>
+                                    <td>
+                                        <button class='btn btn-warning btn-sm' onclick='showActionModal({$row['id']}, \"deactivate\")'>Deactivate</button>
+                                        <button class='btn btn-success btn-sm' onclick='showActionModal({$row['id']}, \"activate\")'>Activate</button>
+                                        <button class='btn btn-danger btn-sm' onclick='showActionModal({$row['id']}, \"delete\")'>Delete</button>
+                                    </td>
+                                </tr>";
                     }
                     ?>
                 </tbody>
@@ -116,39 +292,30 @@ require_once '../includes/db.php';
                         <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Fetch and display customers from the database -->
                     <?php
-                    $result = mysqli_query($conn, "SELECT * FROM customers");
+                    $result = mysqli_query($conn, "SELECT * FROM users WHERE role = 'customer'");
                     while ($row = mysqli_fetch_assoc($result)) {
+                        $status = isset($row['status']) ? ucfirst($row['status']) : 'Unknown';
                         echo "<tr>
-                                <td>{$row['id']}</td>
-                                <td>{$row['name']}</td>
-                                <td>{$row['email']}</td>
-                                <td>
-                                    <button class='btn btn-danger btn-sm' onclick='removeCustomer({$row['id']})'>Remove</button>
-                                </td>
-                              </tr>";
+                                    <td>{$row['id']}</td>
+                                    <td>{$row['firstname']} {$row['lastname']}</td>
+                                    <td>{$row['email']}</td>
+                                    <td>$status</td>
+                                    <td>
+                                        <button class='btn btn-warning btn-sm' onclick='showActionModal({$row['id']}, \"deactivate\")'>Deactivate</button>
+                                        <button class='btn btn-success btn-sm' onclick='showActionModal({$row['id']}, \"activate\")'>Activate</button>
+                                        <button class='btn btn-danger btn-sm' onclick='showActionModal({$row['id']}, \"delete\")'>Delete</button>
+                                    </td>
+                                </tr>";
                     }
                     ?>
                 </tbody>
             </table>
-        </section>
-
-        <!-- Messages -->
-        <section id="messages" class="py-4 px-4">
-            <h4 class="section-title">Messages</h4>
-            <textarea class="form-control mb-3" rows="5" placeholder="Write a message..."></textarea>
-            <button class="btn btn-primary">Send Message</button>
-        </section>
-
-        <!-- Actions -->
-        <section id="actions" class="py-4 px-4">
-            <h4 class="section-title">Oversee Actions</h4>
-            <p>View logs and monitor activities here.</p>
         </section>
     </div>
 
@@ -161,35 +328,210 @@ require_once '../includes/db.php';
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="add_employee.php">
+                    <form method="POST">
+                        <input type="hidden" name="action" value="create_employee">
                         <div class="mb-3">
-                            <label for="employeeName" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="employeeName" name="name" required>
+                            <label for="firstname" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="firstname" name="firstname" required>
                         </div>
                         <div class="mb-3">
-                            <label for="employeeEmail" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="employeeEmail" name="email" required>
+                            <label for="lastname" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="lastname" name="lastname" required>
                         </div>
-                        <button type="submit" class="btn btn-success">Add Employee</button>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Create Employee</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script>
-        function removeEmployee(id) {
-            if (confirm('Are you sure you want to remove this employee?')) {
-                window.location.href = `remove_employee.php?id=${id}`;
-            }
-        }
+    <!-- Action Modal -->
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="actionModalLabel">Account Action</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="actionForm">
+                        <input type="hidden" name="user_id" id="actionUserId">
+                        <input type="hidden" name="action" id="actionType">
+                        <div class="mb-3">
+                            <label for="reason" class="form-label">Reason (optional)</label>
+                            <textarea class="form-control" id="reason" name="reason" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function removeCustomer(id) {
-            if (confirm('Are you sure you want to remove this customer?')) {
-                window.location.href = `remove_customer.php?id=${id}`;
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatToggle = document.getElementById('chat-toggle');
+            const chatList = document.getElementById('chat-list');
+            const chatBox = document.getElementById('chat-box');
+            const chatClose = document.getElementById('chat-close');
+            const chatCloseBox = document.getElementById('chat-close-box');
+            const chatBack = document.getElementById('chat-back');
+            const chatEmployees = document.getElementById('chat-employees');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatForm = document.getElementById('chat-form');
+            const chatNotification = document.getElementById('chat-notification');
+            let currentRecipientId = null;
+
+            // Toggle chat list visibility
+            chatToggle.addEventListener('click', () => {
+                chatList.classList.toggle('d-none');
+                chatBox.classList.add('d-none');
+                if (!chatList.classList.contains('d-none')) {
+                    chatNotification.classList.remove('active');
+                    markMessagesAsRead();
+                    loadEmployeeChats();
+                }
+            });
+
+            chatClose.addEventListener('click', () => {
+                chatList.classList.add('d-none');
+            });
+
+            chatCloseBox.addEventListener('click', () => {
+                chatBox.classList.add('d-none');
+                chatList.classList.remove('d-none');
+            });
+
+            chatBack.addEventListener('click', () => {
+                chatBox.classList.add('d-none');
+                chatList.classList.remove('d-none');
+            });
+
+            // Load employee chats
+            function loadEmployeeChats() {
+                fetch('../fetch_employee_chats.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        chatEmployees.innerHTML = '';
+                        data.forEach(employee => {
+                            const employeeDiv = document.createElement('div');
+                            employeeDiv.className = 'chat-employee';
+                            employeeDiv.innerHTML = `
+                                <img src="../assets/profiles/${employee.profile_image || 'profile-placeholder.png'}" alt="Profile">
+                                <div class="employee-info">
+                                    <div class="employee-name">${employee.firstname} ${employee.lastname}</div>
+                                    <div class="latest-message">${employee.latest_message || 'No messages yet'}</div>
+                                </div>
+                            `;
+                            employeeDiv.addEventListener('click', () => openChat(employee.id));
+                            chatEmployees.appendChild(employeeDiv);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching employee chats:', error));
             }
-        }
+
+            // Open chat with selected employee
+            function openChat(employeeId) {
+                currentRecipientId = employeeId;
+                document.getElementById('recipient-id').value = employeeId;
+                chatList.classList.add('d-none');
+                chatBox.classList.remove('d-none');
+                fetchMessages();
+            }
+
+            // Fetch messages
+            function fetchMessages() {
+                if (!currentRecipientId) return;
+                fetch(`../fetch_messages.php?user_id=${<?php echo $_SESSION['user_id']; ?>}&recipient_id=${currentRecipientId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        chatMessages.innerHTML = '';
+                        if (data.messages) {
+                            data.messages.forEach(msg => {
+                                const messageDiv = document.createElement('div');
+                                messageDiv.className = msg.isSender ? 'admin-message-container' : 'employee-message-container';
+                                messageDiv.innerHTML = `
+                        ${!msg.isSender ? `<img src="../assets/profiles/${msg.profile_image || 'profile-placeholder.png'}" alt="Profile" class="message-profile-img">` : ''}
+                        <div class="${msg.isSender ? 'admin-message' : 'employee-message'}">
+                            <p>${msg.message}</p>
+                        </div>
+                    `;
+                                chatMessages.appendChild(messageDiv);
+                            });
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+                    })
+                    .catch(error => console.error('Fetch error:', error));
+            }
+
+            // Send message
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = new FormData(chatForm);
+
+                fetch('admin_dashboard.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            fetchMessages();
+                            document.getElementById('chat-input').value = '';
+                        } else {
+                            console.error('Error:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Fetch error:', error));
+            });
+
+            // Poll for new messages
+            setInterval(() => {
+                if (!chatBox.classList.contains('d-none')) {
+                    fetchMessages();
+                } else if (chatList.classList.contains('d-none')) {
+                    checkNewMessages();
+                }
+            }, 5000);
+
+            function markMessagesAsRead() {
+                fetch('../mark_messages_read.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: `user_id=${<?php echo $_SESSION['user_id']; ?>}`
+                });
+            }
+
+            function checkNewMessages() {
+                fetch('../check_new_messages.php?user_id=<?php echo $_SESSION['user_id']; ?>')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.hasNewMessages && chatList.classList.contains('d-none')) {
+                            chatNotification.classList.add('active');
+                        }
+                    });
+            }
+
+            checkNewMessages();
+        });
+
+        window.showActionModal = function(userId, action) {
+            document.getElementById('actionUserId').value = userId;
+            document.getElementById('actionType').value = action;
+            const modal = new bootstrap.Modal(document.getElementById('actionModal'));
+            modal.show();
+        };
     </script>
 </body>
 

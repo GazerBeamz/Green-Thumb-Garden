@@ -60,7 +60,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
                     </div>
                     <div class="profile-hover">
                         <p class="fw-bold"><?php echo htmlspecialchars($fullname); ?></p>
-                        <a href="customer_profile.php"><i class="bi bi-pencil-square"></i> My Profile</a>
+                        <a href="../profile.php"><i class="bi bi-pencil-square"></i> My Profile</a>
                         <a href="../logout.php" class="text-danger"><i class="bi bi-box-arrow-right"></i> Logout</a>
                     </div>
                 </div>
