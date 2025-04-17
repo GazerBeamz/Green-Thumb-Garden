@@ -109,6 +109,7 @@ header h1 {
     transform: scale(1.1);
 }
 
+/* Dropdown Styles */
 .profile-hover {
     position: absolute;
     top: 60px;
@@ -117,14 +118,9 @@ header h1 {
     border-radius: 10px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    display: none;
     z-index: 1000;
     min-width: 200px;
     border: 1px solid #e5e7eb;
-}
-
-.profile-container:hover .profile-hover {
-    display: block;
 }
 
 .profile-hover p {
@@ -163,20 +159,20 @@ header h1 {
 }
 
 .chat-box {
-    position: fixed; /* Change from absolute to fixed */
-    bottom: 0; /* Keep it at the bottom of the screen */
-    right: 10px; /* Align it to the right */
+    position: fixed;
+    bottom: 0;
+    right: 10px;
     width: 350px;
     height: 500px;
     background: #f5f5f5;
     border: 1px solid #ccc;
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    display: none; /* Initially hidden */
+    display: none;
     flex-direction: column;
     overflow: hidden;
     font-family: 'Poppins', sans-serif;
-    z-index: 1000; /* Ensure it stays above other elements */
+    z-index: 1000;
 }
 
 .chat-box.d-none {
@@ -201,13 +197,13 @@ header h1 {
 
 /* Chat Messages */
 .chat-messages {
-    flex: 1; /* Take up remaining space */
+    flex: 1;
     padding: 10px;
     overflow-y: auto;
     background: #fff;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end; /* Align messages to the bottom */
+    justify-content: flex-end;
 }
 
 .employee-message {
@@ -276,7 +272,7 @@ header h1 {
 
 .chat-list {
     position: absolute;
-    top: 90px; /* Adjusted from 60px to 80px to move it down */
+    top: 90px;
     right: 10px;
     width: 300px;
     background: #fff;
@@ -346,8 +342,8 @@ header h1 {
     padding: 10px;
     background: #f5f5f5;
     border-top: 1px solid #ccc;
-    width: 100%; /* Ensure it takes full width */
-    box-sizing: border-box; /* Prevent padding from affecting width */
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .chat-form input {

@@ -203,7 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                 </div>
                 <div class="profile-container">
                     <img src="../assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" alt="Admin Profile" class="profile-img">
-                    <div class="profile-hover">
+                    <div class="profile-hover d-none">
                         <p><?php echo htmlspecialchars($user['firstname'] . ' ' . $user['lastname']); ?></p>
                         <a href="../profile.php"><i class="fas fa-user"></i> My Profile</a>
                         <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -381,6 +381,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/profile-dropdown.js"></script>
     <script>
         // Pass the user ID to JavaScript
         window.currentUserId = <?php echo json_encode($_SESSION['user_id']); ?>;

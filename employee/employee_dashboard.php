@@ -85,7 +85,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
     <title>Employee Dashboard - Green Thumb Garden</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="../assets/css/employee_dashboard.css" rel="stylesheet"> 
+    <link href="../assets/css/employee_dashboard.css" rel="stylesheet">
 </head>
 
 <body>
@@ -110,7 +110,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
                 <div class="profile-icon">
                     <img src="../assets/profiles/<?php echo htmlspecialchars($employee['profile_image'] ?: 'profile-placeholder.png'); ?>" alt="Employee Profile" class="profile-img">
                 </div>
-                <div class="profile-hover">
+                <div class="profile-hover d-none">
                     <p><?php echo htmlspecialchars($employee['firstname'] . ' ' . $employee['lastname']); ?></p>
                     <a href="../profile.php"><i class="bi bi-pencil-square"></i> My Profile</a>
                     <a href="../logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -231,6 +231,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/profile-dropdown.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const chatToggle = document.getElementById('chat-toggle');
@@ -258,19 +259,19 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
                 const formData = new FormData(chatForm);
 
                 fetch('employee_dashboard.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        fetchMessages();
-                        document.getElementById('chat-input').value = '';
-                    } else {
-                        console.error('Error:', data.message);
-                    }
-                })
-                .catch(error => console.error('Fetch error:', error));
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            fetchMessages();
+                            document.getElementById('chat-input').value = '';
+                        } else {
+                            console.error('Error:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Fetch error:', error));
             });
 
             function fetchMessages() {

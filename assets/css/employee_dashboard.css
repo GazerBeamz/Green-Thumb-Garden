@@ -120,7 +120,7 @@ header {
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
-    overflow: visible; /* Change from hidden to visible */
+    overflow: visible;
 }
 
 header h1 {
@@ -130,51 +130,12 @@ header h1 {
     margin-bottom: 0;
 }
 
-/* Search Bar */
-.search-bar {
-    max-width: 300px;
-    position: relative;
-}
-
-.search-bar input {
-    border-radius: 25px;
-    padding: 12px 40px 12px 20px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    font-size: 0.95rem;
-    background: #fff;
-}
-
-.search-bar input:focus {
-    border-color: #2ecc71;
-    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
-    outline: none;
-}
-
-.search-bar button {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    border-radius: 50%;
-    padding: 8px;
-    background: #2ecc71;
-    border: none;
-    color: #fff;
-    transition: background 0.3s ease;
-}
-
-.search-bar button:hover {
-    background: #27ae60;
-}
-
 /* Profile Container */
 .profile-container {
     position: relative;
     cursor: pointer;
     overflow: visible;
-    z-index: 10000; /* Ensure it appears above other elements */
+    z-index: 10000;
 }
 
 .profile-icon img {
@@ -183,42 +144,23 @@ header h1 {
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid #2ecc71;
-    transition: transform 0.3s ease;
-}
-
-.profile-container:hover .profile-icon img {
-    transform: scale(1.1);
 }
 
 /* Dropdown Styles */
 .profile-hover {
     position: absolute;
-    top: 50px; /* Position below the profile icon */
-    right: 50%; /* Align to the center of the profile icon */
-    transform: translateX(50%); /* Adjust to center */
+    top: 50px;
+    right: 50%;
+    transform: translateX(50%);
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    display: none; /* Initially hidden */
-    opacity: 0;
-    visibility: hidden;
-    z-index: 9999; /* Ensure it appears above all other elements */
+    z-index: 9999;
     min-width: 220px;
     border: 1px solid #e2e8f0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    transition-delay: 2s;
 }
 
-/* Show dropdown on hover */
-.profile-container:hover .profile-hover,
-.profile-hover:hover {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Dropdown Links */
 .profile-hover p {
     font-size: 1rem;
     font-weight: 600;
@@ -300,85 +242,6 @@ section h4::after {
 .card p {
     font-size: 0.9rem;
     color: #718096;
-}
-
-/* Recommendations Section */
-.recommendations .d-flex {
-    overflow-x: auto;
-    padding-bottom: 10px;
-    scrollbar-width: thin;
-    scrollbar-color: #2ecc71 #e2e8f0;
-}
-
-.recommendations .card {
-    min-width: 200px;
-}
-
-/* Categories Section */
-.categories .btn {
-    border-radius: 25px;
-    padding: 8px 20px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    border: 1px solid #2ecc71;
-    color: #2ecc71;
-    background: transparent;
-    transition: all 0.3s ease;
-}
-
-.categories .btn:hover {
-    background: #2ecc71;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
-}
-
-.category-btn.active {
-    background: #2ecc71;
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(46, 204, 113, 0.2);
-}
-
-/* Products Section */
-#products-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 1.5rem;
-    position: relative;
-}
-
-.product-item {
-    opacity: 1;
-    transition: opacity 0.3s ease;
-}
-
-.product-item.hidden {
-    display: none;
-}
-
-.product-item.fade-in {
-    animation: fadeIn 0.5s ease-in-out;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.no-products-message {
-    text-align: center;
-    font-size: 1rem;
-    color: #718096;
-    padding: 20px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    margin-top: 20px;
 }
 
 /* Chat Head Styles for Employee Dashboard */
@@ -469,9 +332,6 @@ section h4::after {
         margin-left: 220px;
         padding: 30px;
     }
-    .search-bar {
-        max-width: 250px;
-    }
     header {
         min-height: 120px;
         padding: 20px 30px;
@@ -502,15 +362,6 @@ section h4::after {
         display: block;
     }
 
-    .search-bar {
-        max-width: 100%;
-        margin-top: 15px;
-    }
-
-    .recommendations .d-flex {
-        flex-wrap: nowrap;
-    }
-
     header {
         min-height: 100px;
         padding: 15px 20px;
@@ -537,10 +388,6 @@ section h4::after {
     .profile-hover {
         min-width: 180px;
         top: 40px;
-    }
-    .categories .btn {
-        padding: 6px 15px;
-        font-size: 0.9rem;
     }
     header {
         min-height: 80px;

@@ -120,7 +120,7 @@ header {
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
-    overflow: visible; /* Change from hidden to visible */
+    overflow: visible;
 }
 
 header h1 {
@@ -174,7 +174,7 @@ header h1 {
     position: relative;
     cursor: pointer;
     overflow: visible;
-    z-index: 10000; /* Ensure it appears above other elements */
+    z-index: 10000;
 }
 
 .profile-icon img {
@@ -183,42 +183,23 @@ header h1 {
     object-fit: cover;
     border-radius: 50%;
     border: 2px solid #2ecc71;
-    transition: transform 0.3s ease;
-}
-
-.profile-container:hover .profile-icon img {
-    transform: scale(1.1);
 }
 
 /* Dropdown Styles */
 .profile-hover {
     position: absolute;
-    top: 50px; /* Position below the profile icon */
-    right: 50%; /* Align to the center of the profile icon */
-    transform: translateX(50%); /* Adjust to center */
+    top: 50px;
+    right: 50%;
+    transform: translateX(50%);
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     padding: 15px;
-    display: none; /* Initially hidden */
-    opacity: 0;
-    visibility: hidden;
-    z-index: 9999; /* Ensure it appears above all other elements */
+    z-index: 9999;
     min-width: 220px;
     border: 1px solid #e2e8f0;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    transition-delay: 2s;
 }
 
-/* Show dropdown on hover */
-.profile-container:hover .profile-hover,
-.profile-hover:hover {
-    display: block;
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Dropdown Links */
 .profile-hover p {
     font-size: 1rem;
     font-weight: 600;
