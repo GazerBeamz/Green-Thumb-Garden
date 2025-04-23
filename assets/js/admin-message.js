@@ -183,10 +183,11 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// Function for action modal (previously defined as window.showActionModal)
+/* // Function for action modal (previously defined as window.showActionModal)
 function showActionModal(userId, action) {
   document.getElementById("actionUserId").value = userId;
   document.getElementById("actionType").value = action;
   const modal = new bootstrap.Modal(document.getElementById("actionModal"));
   modal.show();
 }
+ */
