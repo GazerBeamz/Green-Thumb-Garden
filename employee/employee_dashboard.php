@@ -124,7 +124,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card shadow-sm text-center p-4">
-                        <h6>Total Products</h6>
+                        <h6>Total Products </h6>
                         <p class="display-6 text-primary">
                             <?php
                             $result = mysqli_query($conn, "SELECT COUNT(*) AS total FROM products");
@@ -322,6 +322,19 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
 
             checkNewMessages();
         });
+        
+        // check the session
+        setInterval(() => {
+            fetch('../check_session.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.session_status === 'inactive') {
+                        alert('Session Ended');
+                        window.location.href = '../login.php?message=Session Ended';
+                    }
+                })
+                .catch(error => console.error('Error checking session:', error));
+        }, 5000); // Check every 5 seconds
     </script>
 </body>
 

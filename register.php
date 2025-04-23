@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             try {
                 // Server settings
                 $mail->isSMTP();
-                $mail->Host = 'smtp.    gmail.com'; // Gmail SMTP server
+                $mail->Host = 'smtp.gmail.com'; // Gmail SMTP server
                 $mail->SMTPAuth = true;
                 $mail->Username = 'brandonkylerojas1@gmail.com'; // Your Gmail address
                 $mail->Password = 'yhtq gtsf byxj kyde'; // Your Gmail app password

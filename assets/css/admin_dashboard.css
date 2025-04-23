@@ -422,6 +422,16 @@ header h1 {
     background: #f3f4f6;
 }
 
+#account-logs {
+    margin-top: 20px;
+}
+
+#account-logs .table {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* Buttons */
 button {
     border: none;

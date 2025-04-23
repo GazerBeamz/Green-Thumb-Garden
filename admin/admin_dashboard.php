@@ -77,17 +77,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
     $reason = mysqli_real_escape_string($conn, $_POST['reason'] ?? '');
 
     if ($_POST['action'] === 'deactivate') {
-        $query = "UPDATE users SET status = 'inactive', deactivation_reason = '$reason' WHERE id = $userId";
+        $query = "UPDATE users SET status = 'inactive', session_status = 'inactive', deactivation_reason = '$reason' WHERE id = $userId";
         if (mysqli_query($conn, $query)) {
+            // Send a message to the user
             $message = "Your account has been deactivated. Reason: $reason";
             $query = "INSERT INTO messages (sender_id, recipient_id, message, is_read) VALUES ({$_SESSION['user_id']}, $userId, '$message', 0)";
             mysqli_query($conn, $query);
+
+            // Fetch the user's email
+            $result = mysqli_query($conn, "SELECT email FROM users WHERE id = $userId");
+            $user = mysqli_fetch_assoc($result);
+            $email = $user['email'];
+
+            // Send an email notification
+            $mail = new PHPMailer(true);
+            try {
+                $mail->isSMTP();
+                $mail->Host = 'smtp.gmail.com';
+                $mail->SMTPAuth = true;
+                $mail->Username = 'brandonkylerojas1@gmail.com';
+                $mail->Password = 'yhtq gtsf byxj kyde';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+                $mail->Port = 587;
+                $mail->setFrom('your-email@gmail.com', 'Green Thumb Garden');
+                $mail->addAddress($email);
+                $mail->isHTML(true);
+                $mail->Subject = 'Account Deactivation Notification';
+                $mail->Body = "<p>Your account has been deactivated. Reason: $reason</p>";
+                $mail->send();
+            } catch (Exception $e) {
+                $errorMessage = "Account deactivated, but email failed: " . $mail->ErrorInfo;
+            }
+
             $successMessage = "Account deactivated successfully!";
         } else {
             $errorMessage = "Failed to deactivate account: " . mysqli_error($conn);
         }
     } elseif ($_POST['action'] === 'activate') {
-        $query = "UPDATE users SET status = 'active', deactivation_reason = NULL WHERE id = $userId";
+        $query = "UPDATE users SET status = 'active', session_status = 'active', deactivation_reason = NULL WHERE id = $userId";
         if (mysqli_query($conn, $query)) {
             $successMessage = "Account activated successfully!";
         } else {
@@ -105,8 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                 $mail->isSMTP();
                 $mail->Host = 'smtp.gmail.com';
                 $mail->SMTPAuth = true;
-                $mail->Username = 'your-email@gmail.com';
-                $mail->Password = 'your-email-password';
+                $mail->Username = 'brandonkylerojas1@gmail.com';
+                $mail->Password = 'yhtq gtsf byxj kyde';
                 $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
                 $mail->Port = 587;
                 $mail->setFrom('your-email@gmail.com', 'Green Thumb Garden');
@@ -131,6 +158,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'activate') {
+    $userId = intval($_POST['user_id']);
+    $query = "UPDATE users SET status = 'active', session_status = 'active', deactivation_reason = NULL WHERE id = $userId";
+    if (mysqli_query($conn, $query)) {
+        echo "User activated successfully!";
+    } else {
+        echo "Failed to activate user: " . mysqli_error($conn);
+    }
+    exit();
+}
+
+$query = "
+    SELECT 
+        account_logs.id AS log_id,
+        account_logs.action,
+        account_logs.reason,
+        account_logs.created_at,
+        CONCAT(users.firstname, ' ', users.lastname) AS user_account,
+        users.role
+    FROM 
+        account_logs
+    INNER JOIN 
+        users 
+    ON 
+        account_logs.user_id = users.id
+    ORDER BY 
+        account_logs.created_at DESC
+";
+
+$result = mysqli_query($conn, $query);
 ?>
 
 <!DOCTYPE html>
@@ -248,8 +306,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             </div>
         </section>
 
-        
-        <!-- <section id="manage-employees" class="py-4 px-4">
+
+        <section id="manage-employees" class="py-4 px-4">
             <h4 class="section-title">Manage Employees</h4>
             <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">Add Employee</button>
             <?php if (isset($successMessage)) echo "<p class='alert alert-success'>$successMessage</p>"; ?>
@@ -275,9 +333,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                                     <td>{$row['email']}</td>
                                     <td>$status</td>
                                     <td>
-                                        <button class='btn btn-warning btn-sm' onclick='showActionModal({$row['id']}, \"deactivate\")'>Deactivate</button>
-                                        <button class='btn btn-success btn-sm' onclick='showActionModal({$row['id']}, \"activate\")'>Activate</button>
-                                        <button class='btn btn-danger btn-sm' onclick='showActionModal({$row['id']}, \"delete\")'>Delete</button>
+                                        <button 
+                                            class='btn btn-warning btn-sm' 
+                                            onclick='showActionModal({$row['id']}, \"deactivate\")'
+                                        >
+                                            Deactivate
+                                        </button>
+                                        <button 
+                                            class='btn btn-success btn-sm' 
+                                            onclick='activateUser({$row['id']}, \"$status\")'
+                                        >
+                                            Activate
+                                        </button>
+                                        <button 
+                                            class='btn btn-danger btn-sm' 
+                                            onclick='showActionModal({$row['id']}, \"delete\")'
+                                        >
+                                            Delete
+                                        </button>
                                     </td>
                                 </tr>";
                     }
@@ -286,7 +359,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             </table>
         </section>
 
-        
+
         <section id="manage-customers" class="py-4 px-4">
             <h4 class="section-title">Manage Customers</h4>
             <table class="table table-striped table-hover">
@@ -319,7 +392,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
                     ?>
                 </tbody>
             </table>
-        </section> -->
+        </section>
+
+        <section id="account-logs" class="py-4 px-4">
+            <h4 class="section-title">Account Logs</h4>
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Log ID</th>
+                        <th>User Account</th>
+                        <th>Role</th>
+                        <th>Action</th>
+                        <th>Reason</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $query = "
+                        SELECT 
+                            account_logs.id AS log_id,
+                            account_logs.action,
+                            account_logs.reason,
+                            account_logs.created_at,
+                            CONCAT(users.firstname, ' ', users.lastname) AS user_account,
+                            users.role
+                        FROM 
+                            account_logs
+                        INNER JOIN 
+                            users 
+                        ON 
+                            account_logs.user_id = users.id
+                        ORDER BY 
+                            account_logs.created_at DESC
+                    ";
+                    $result = mysqli_query($conn, $query);
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>
+                            <td>{$row['log_id']}</td>
+                            <td>" . htmlspecialchars($row['user_account']) . "</td>
+                            <td>" . ucfirst(htmlspecialchars($row['role'])) . "</td>
+                            <td>" . htmlspecialchars($row['action']) . "</td>
+                            <td>" . htmlspecialchars($row['reason']) . "</td>
+                            <td>" . htmlspecialchars($row['created_at']) . "</td>
+                        </tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </section>
     </main>
 
     <!-- Add Employee Modal -->
@@ -384,8 +505,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
     <script>
         // Pass the user ID to JavaScript
         window.currentUserId = <?php echo json_encode($_SESSION['user_id']); ?>;
+        document.addEventListener("DOMContentLoaded", () => {
+            setInterval(() => {
+                fetch('../check_session.php') // Updated path
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.session_status === 'inactive') {
+                            alert('Session Ended');
+                            window.location.href = '../login.php?message=Session Ended'; // Ensure the correct path to login.php
+                        }
+                    })  
+                    .catch(error => console.error('Error checking session:', error));
+            }, 5000); // Check every 5 seconds
+        });
     </script>
     <script src="../assets/js/admin-message.js"></script>
+    <script src="../assets/js/account-activation.js"></script>
 </body>
 
 </html>

@@ -73,6 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <form method="POST">
                 <?php if (isset($error)) echo "<p class='text-danger text-center mb-3 animate__animated animate__shakeX'>$error</p>"; ?>
+                <?php if (isset($_GET['message']) && $_GET['message'] === 'Session Ended') : ?>
+                    <div class="alert alert-warning text-center">
+                        Session Ended
+                    </div>
+                <?php endif; ?>
                 <div class="mb-4 position-relative">
                     <label for="email" class="form-label fw-semibold">Email</label>
                     <div class="input-group">
