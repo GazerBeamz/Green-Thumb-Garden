@@ -35,6 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
     $product_price = mysqli_real_escape_string($conn, $_POST['product_price']);
     $product_category = mysqli_real_escape_string($conn, $_POST['product_category']);
+    $product_description = mysqli_real_escape_string($conn, $_POST['product_description']);
+    $employee_id = $_SESSION['user_id']; // Automatically set to the logged-in employee
     $product_image = '';
 
     if (!empty($_FILES['product_image']['name'])) {
@@ -55,7 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 
     if (empty($errorMessage)) {
-        $query = "INSERT INTO products (name, price, category, image) VALUES ('$product_name', '$product_price', '$product_category', '$product_image')";
+        $query = "INSERT INTO products (name, description, category, price, image, employee_id) 
+                  VALUES ('$product_name', '$product_description', '$product_category', '$product_price', '$product_image', '$employee_id')";
         if (mysqli_query($conn, $query)) {
             $successMessage = "Product added successfully!";
         } else {
@@ -72,6 +75,21 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
         $successMessage = "Product removed successfully!";
     } else {
         $errorMessage = "Failed to remove product: " . mysqli_error($conn);
+    }
+}
+
+// Handle product editing
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit_product') {
+    $product_id = intval($_POST['product_id']);
+    $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
+    $product_price = mysqli_real_escape_string($conn, $_POST['product_price']);
+    $product_category = mysqli_real_escape_string($conn, $_POST['product_category']);
+
+    $query = "UPDATE products SET name = '$product_name', price = '$product_price', category = '$product_category' WHERE id = $product_id";
+    if (mysqli_query($conn, $query)) {
+        $successMessage = "Product updated successfully!";
+    } else {
+        $errorMessage = "Failed to update product: " . mysqli_error($conn);
     }
 }
 ?>
@@ -98,7 +116,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
         <nav class="nav flex-column">
             <a href="employee_dashboard.php" class="nav-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="#manage-products" class="nav-link"><i class="fas fa-box"></i> Manage Products</a>
-            <a href="../logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <!-- <a href="../logout.php" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a> -->
         </nav>
     </div>
 
@@ -163,6 +181,13 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
                                 <td>\${$row['price']}</td>
                                 <td>{$row['category']}</td>
                                 <td>
+                                    <a href='#' class='btn btn-warning btn-sm' data-bs-toggle='modal' data-bs-target='#editProductModal' 
+                                       data-id='{$row['id']}' 
+                                       data-name='" . htmlspecialchars($row['name']) . "' 
+                                       data-price='{$row['price']}' 
+                                       data-category='" . htmlspecialchars($row['category']) . "'>
+                                       Edit
+                                    </a>
                                     <a href='?action=remove_product&id={$row['id']}' class='btn btn-danger btn-sm'>Remove</a>
                                 </td>
                               </tr>";
@@ -207,23 +232,74 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
                 <div class="modal-body">
                     <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="action" value="add_product">
+                        <!-- product name -->
                         <div class="mb-3">
                             <label for="product_name" class="form-label">Product Name</label>
                             <input type="text" class="form-control" id="product_name" name="product_name" required>
                         </div>
+                        <!-- product price -->
                         <div class="mb-3">
                             <label for="product_price" class="form-label">Product Price</label>
                             <input type="number" class="form-control" id="product_price" name="product_price" required>
                         </div>
+                        <!-- product description -->
+                        <div class="mb-3">
+                            <label for="product_description" class="form-label">Product Description</label>
+                            <textarea class="form-control" id="product_description" name="product_description" rows="3" required></textarea>
+                        </div>
                         <div class="mb-3">
                             <label for="product_category" class="form-label">Product Category</label>
-                            <input type="text" class="form-control" id="product_category" name="product_category" required>
+                            <select class="form-select" id="product_category" name="product_category" required>
+                                <option value="Flowers">Flowers</option>
+                                <option value="Vegetable">Vegetable</option>
+                                <option value="Herb">Herb</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="product_image" class="form-label">Product Image</label>
                             <input type="file" class="form-control" id="product_image" name="product_image" accept="image/*">
                         </div>
                         <button type="submit" class="btn btn-success">Add Product</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST">
+                        <input type="hidden" name="action" value="edit_product">
+                        <input type="hidden" id="edit_product_id" name="product_id">
+                        <!-- Product Name -->
+                        <div class="mb-3">
+                            <label for="edit_product_name" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="edit_product_name" name="product_name" required>
+                        </div>
+                        <!-- Product Price -->
+                        <div class="mb-3">
+                            <label for="edit_product_price" class="form-label">Product Price</label>
+                            <input type="number" class="form-control" id="edit_product_price" name="product_price" required>
+                        </div>
+                        <!-- Product Category -->
+                        <div class="mb-3">
+                            <label for="edit_product_category" class="form-label">Product Category</label>
+                            <select class="form-select" id="edit_product_category" name="product_category" required>
+                                <option value="Flowers">Flowers</option>
+                                <option value="Vegetable">Vegetable</option>
+                                <option value="Herb">Herb</option>
+                                <option value="Miscellaneous">Miscellaneous</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
                     </form>
                 </div>
             </div>
@@ -240,6 +316,20 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
             const chatMessages = document.getElementById('chat-messages');
             const chatClose = document.getElementById('chat-close');
             const chatNotification = document.getElementById('chat-notification');
+
+            // Edit
+            const editProductModal = document.getElementById("editProductModal");
+            editProductModal.addEventListener("show.bs.modal", (event) => {
+            const button = event.relatedTarget;
+            const productId = button.getAttribute("data-id");
+            const productName = button.getAttribute("data-name");
+            const productPrice = button.getAttribute("data-price");
+            const productCategory = button.getAttribute("data-category");
+
+            document.getElementById("edit_product_id").value = productId;
+            document.getElementById("edit_product_name").value = productName;
+            document.getElementById("edit_product_price").value = productPrice;
+            document.getElementById("edit_product_category").value = productCategory;
 
             chatToggle.addEventListener('click', () => {
                 chatBox.classList.toggle('d-none');
@@ -322,7 +412,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'remove_product' && isset($_GE
 
             checkNewMessages();
         });
-        
+
         // check the session
         setInterval(() => {
             fetch('../check_session.php')

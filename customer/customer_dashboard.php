@@ -116,35 +116,28 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
             <h4 class="animate__animated animate__fadeIn">Products</h4>
             <div class="grid-container" id="products-container">
                 <?php
-                // Path to the products folder
-                $productsFolder = '../assets/products/';
-                $productFiles = scandir($productsFolder);
+                // Fetch products from the database
+                $query = "SELECT * FROM products";
+                $result = mysqli_query($conn, $query);
 
-                // Loop through all files in the products folder
-                foreach ($productFiles as $file) {
-                    // Skip '.' and '..'
-                    if ($file !== '.' && $file !== '..') {
-                        // Extract product name and category from the file name
-                        $productName = pathinfo($file, PATHINFO_FILENAME);
-                        // Adjust the displayed name to remove plural forms
-                        $productNameFormatted = ucwords(str_replace('_', ' ', $productName));
-                        $productNameFormatted = str_replace('Vegetables', 'Vegetable', $productNameFormatted);
-                        $productNameFormatted = str_replace('Herbs', 'Herb', $productNameFormatted);
-                        $productNameFormatted = str_replace('Miscellaneous', 'Misc', $productNameFormatted);
-                        $price = rand(300, 1000); // Random price for demonstration
-
-                        // Assign category based on the file name prefix (e.g., 'flower', 'vegetable')
-                        $category = strtolower(preg_replace('/\d+$/', '', $productName)); // Remove trailing numbers
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        $productName = htmlspecialchars($row['name']);
+                        $productPrice = number_format($row['price'], 2);
+                        $productCategory = strtolower(htmlspecialchars($row['category']));
+                        $productImage = htmlspecialchars($row['image']);
                 ?>
-                        <div class="product-item">
-                            <div class="card" data-category="<?php echo htmlspecialchars($category); ?>">
-                                <img src="<?php echo $productsFolder . $file; ?>" alt="<?php echo htmlspecialchars($productNameFormatted); ?>" class="img-fluid">
-                                <h6><?php echo htmlspecialchars($productNameFormatted); ?></h6>
-                                <p>₱<?php echo number_format($price, 2); ?></p>
+                        <div class="product-item" data-category="<?php echo $productCategory; ?>">
+                            <div class="card">
+                                <img src="../assets/products/<?php echo $productImage; ?>" alt="<?php echo $productName; ?>" class="img-fluid">
+                                <h6><?php echo $productName; ?></h6>
+                                <p>₱<?php echo $productPrice; ?></p>
                             </div>
                         </div>
                 <?php
                     }
+                } else {
+                    echo "<p class='no-products-message'>No products available.</p>";
                 }
                 ?>
             </div>
@@ -152,12 +145,35 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/filter-products.js"></script>
+    <!-- <script src="../assets/js/filter-products.js"></script> -->
     <script src="../assets/js/profile-dropdown.js"></script>
     <script src="../assets/js/account-activation.js"></script>
 </body>
 
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const categoryButtons = document.querySelectorAll(".category-btn");
+        const productItems = document.querySelectorAll(".product-item");
+
+        categoryButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const category = button.getAttribute("data-category");
+
+                // Highlight the active button
+                categoryButtons.forEach(btn => btn.classList.remove("active"));
+                button.classList.add("active");
+
+                // Filter products
+                productItems.forEach(item => {
+                    if (category === "all" || item.getAttribute("data-category") === category) {
+                        item.style.display = "block";
+                    } else {
+                        item.style.display = "none";
+                    }
+                });
+            });
+        });
+    });
     // check the session
     setInterval(() => {
             fetch('../check_session.php')

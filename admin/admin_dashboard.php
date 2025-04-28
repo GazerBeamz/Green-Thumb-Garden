@@ -231,6 +231,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     </script>
     <script src="../assets/js/admin-message.js"></script>
     <script src="../assets/js/line-graph-chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const activityList = document.querySelector(".activity-list");
+
+            // Fetch recent activities
+            function fetchRecentActivities() {
+                fetch("fetch_recent_activity.php")
+                    .then(response => response.json())
+                    .then(data => {
+                        activityList.innerHTML = ""; // Clear the list
+                        data.forEach(activity => {
+                            const activityItem = document.createElement("div");
+                            activityItem.className = "activity-item";
+                            activityItem.innerHTML = `
+                                <img src="../assets/profiles/${activity.profile_image}" alt="Profile Icon" class="activity-icon">
+                                <div class="activity-info">
+                                    <span class="activity-user">${activity.firstname} ${activity.lastname}</span>
+                                    <span class="activity-action">${activity.type === 'login' ? 'Logged in' : 'Logged out'}</span>
+                                    <span class="activity-time">${activity.time}</span>
+                                </div>
+                            `;
+                            activityList.appendChild(activityItem);
+                        });
+                    })
+                    .catch(error => console.error("Error fetching recent activities:", error));
+            }
+
+            // Fetch activities every 10 seconds
+            fetchRecentActivities();
+            setInterval(fetchRecentActivities, 10000);
+        });
+    </script>
 </body>
 
 </html>

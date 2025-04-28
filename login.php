@@ -32,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Redirect based on role
             if ($user['role'] === 'employee') {
+                $userId = $user['id'];
+                mysqli_query($conn, "INSERT INTO login_logs (user_id) VALUES ($userId)");
                 header("Location: employee/employee_dashboard.php");
             } elseif ($user['role'] === 'admin') {
                 header("Location: admin/admin_dashboard.php");
