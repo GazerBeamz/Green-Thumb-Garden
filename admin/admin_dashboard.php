@@ -141,8 +141,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 </div>
             </div>
 
-            <!-- Order Growth Line Graph and Recent Activity (Hidden on Small Screens) -->
-            <div class="row g-4 mt-4 d-none d-lg-flex" id="analytics-section">
+            <!-- Order Growth Line Graph and Recent Activity -->
+            <div class="row g-4 mt-4" id="analytics-section">
                 <!-- Line Graph -->
                 <div class="col-lg-8 col-md-12">
                     <div class="card shadow-sm p-4 order-stats-card">

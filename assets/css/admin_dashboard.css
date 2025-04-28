@@ -487,6 +487,7 @@ header h1 {
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  flex-grow: 1; /* Allow the card to grow and fill available space */
 }
 
 .order-stats-card::before {
@@ -547,7 +548,8 @@ header h1 {
 
 .chart-container {
   position: relative;
-  height: 400px;
+  height: 400px; /* Keep the height as is */
+  width: 100%; /* Ensure it takes the full width of its container */
   max-height: 400px;
   margin-bottom: 20px;
 }
@@ -905,4 +907,17 @@ button.btn-refresh:hover {
   .activity-list {
     max-height: 150px;
   }
+}
+
+#analytics-section {
+  display: flex;
+  gap: 20px;
+}
+
+#analytics-section .col-lg-8 {
+  flex: 2; /* Make the graph section wider */
+}
+
+#analytics-section .col-lg-4 {
+  flex: 1; /* Keep the Recent Activity section smaller */
 }
