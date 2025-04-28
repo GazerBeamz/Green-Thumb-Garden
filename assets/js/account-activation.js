@@ -1,5 +1,3 @@
-// account-activation.js
-
 // Utility function to show a success alert using SweetAlert
 function showSuccessAlert(title, text) {
   return Swal.fire({

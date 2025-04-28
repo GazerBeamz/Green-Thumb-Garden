@@ -122,18 +122,22 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
+                        $productId = $row['id'];
                         $productName = htmlspecialchars($row['name']);
                         $productPrice = number_format($row['price'], 2);
                         $productCategory = strtolower(htmlspecialchars($row['category']));
                         $productImage = htmlspecialchars($row['image']);
                 ?>
-                        <div class="product-item" data-category="<?php echo $productCategory; ?>">
-                            <div class="card">
-                                <img src="../assets/products/<?php echo $productImage; ?>" alt="<?php echo $productName; ?>" class="img-fluid">
-                                <h6><?php echo $productName; ?></h6>
-                                <p>₱<?php echo $productPrice; ?></p>
+                        <!-- Wrap the product card in a link -->
+                        <a href="check_out.php?product_id=<?php echo $productId; ?>" class="product-item-link">
+                            <div class="product-item" data-category="<?php echo $productCategory; ?>">
+                                <div class="card">
+                                    <img src="../assets/products/<?php echo $productImage; ?>" alt="<?php echo $productName; ?>" class="img-fluid">
+                                    <h6><?php echo $productName; ?></h6>
+                                    <p>₱<?php echo $productPrice; ?></p>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                 <?php
                     }
                 } else {

@@ -1,4 +1,3 @@
-<!-- filepath: c:\xampp\htdocs\greenthumb_garden\profile.php -->
 <?php
 require_once 'includes/db.php';
 
@@ -10,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
 
 // Fetch user details
 $user_id = $_SESSION['user_id'];
-$query = "SELECT firstname, lastname, username, email, profile_image, role FROM users WHERE id = '$user_id'";
+$query = "SELECT firstname, lastname, username, email, profile_image, role, contact, address FROM users WHERE id = '$user_id'";
 $result = mysqli_query($conn, $query);
 $user = mysqli_fetch_assoc($result);
 
@@ -26,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lastname = mysqli_real_escape_string($conn, $_POST['lastname']);
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
+    $contact = mysqli_real_escape_string($conn, $_POST['contact']);
+    $address = mysqli_real_escape_string($conn, $_POST['address']);
 
     // Handle profile image upload
     if (!empty($_FILES['profile_image']['name'])) {
@@ -50,11 +51,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Update user details in the database
-    $updateQuery = "UPDATE users SET firstname = '$firstname', lastname = '$lastname', username = '$username', email = '$email', profile_image = '$profileImage' WHERE id = '$user_id'";
+    $updateQuery = "UPDATE users SET 
+        firstname = '$firstname', 
+        lastname = '$lastname', 
+        username = '$username', 
+        email = '$email', 
+        contact = '$contact', 
+        address = '$address', 
+        profile_image = '$profileImage' 
+        WHERE id = '$user_id'";
     if (mysqli_query($conn, $updateQuery)) {
         $successMessage = "Profile updated successfully!";
         // Refresh user details
-        $query = "SELECT firstname, lastname, username, email, profile_image, role FROM users WHERE id = '$user_id'";
+        $query = "SELECT firstname, lastname, username, email, profile_image, role, contact, address FROM users WHERE id = '$user_id'";
         $result = mysqli_query($conn, $query);
         $user = mysqli_fetch_assoc($result);
     } else {
@@ -83,9 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="profile-image-wrapper">
                     <form method="POST" action="" enctype="multipart/form-data" id="profileForm">
                         <label for="profile_image">
-                            <img src="assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>" 
-                                 alt="Profile Picture" 
-                                 id="profileImagePreview">
+                            <img src="assets/profiles/<?php echo htmlspecialchars($user['profile_image'] ?: 'profile-placeholder.png'); ?>"
+                                alt="Profile Picture"
+                                id="profileImagePreview">
                             <span class="upload-icon"><i class="fas fa-camera"></i></span>
                         </label>
                         <input type="file" id="profile_image" name="profile_image" accept="image/*">
@@ -124,6 +133,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email']); ?>" readonly>
+                </div>
+                <div class="mb-3">
+                    <label for="contact" class="form-label">Contact</label>
+                    <input type="text" class="form-control" id="contact" name="contact" value="<?php echo htmlspecialchars($user['contact'] ?? ''); ?>" required>
+                </div>
+                <!-- filepath: c:\xampp\htdocs\greenthumb_garden\profile.php -->
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control" id="address" name="address" rows="4" required><?php echo htmlspecialchars($user['address'] ?? ''); ?></textarea>
                 </div>
                 <div class="d-flex gap-3">
                     <button type="submit" class="btn btn-success">Save Profile</button>

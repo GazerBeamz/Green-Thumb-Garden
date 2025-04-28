@@ -13,6 +13,7 @@ body {
     color: #2d3748;
 }
 
+
 /* Sidebar */
 .sidebar {
     height: 100vh;
@@ -362,6 +363,44 @@ section h4::after {
     margin-top: 20px;
 }
 
+.product-item-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.product-item-link:hover .card {
+    transform: scale(1.05);
+    transition: transform 0.3s ease;
+}
+
+/* Customer Details Section */
+#customer-details {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    text-align: center;
+}
+
+.customer-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.customer-icon {
+    font-size: 50px;
+    color: #28a745;
+}
+
+.customer-info p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 500;
+    color: #333;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
     .sidebar {
@@ -420,6 +459,22 @@ section h4::after {
 
     header h1 {
         font-size: 1.8rem;
+    }
+
+    #customer-details {
+        padding: 15px;
+    }
+
+    .customer-card {
+        flex-direction: column;
+    }
+
+    .customer-icon {
+        font-size: 40px;
+    }
+
+    .customer-info p {
+        font-size: 14px;
     }
 }
 
