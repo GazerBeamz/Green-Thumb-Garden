@@ -20,3 +20,4 @@ if ($row = mysqli_fetch_assoc($result)) {
 } else {
     echo json_encode(['status' => 'error', 'message' => 'Customer not found.']);
 }
+?>

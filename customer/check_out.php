@@ -17,24 +17,18 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Green Thumb Garden</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="../assets/css/customer_dashboard.css" rel="stylesheet">
     <link href="../assets/css/check_out.css" rel="stylesheet">
-    <!-- SweetAlert2 for notifications -->
+    <link href="../assets/css/customer_dashboard.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="../assets/js/checkout.js"></script>
-
-
 </head>
-
 <body>
     <!-- Sidebar -->
     <nav class="sidebar">
@@ -71,11 +65,11 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
         <!-- Checkout Section -->
         <section class="checkout-section">
-            <div class="row g-4">
-                <!-- First Column: Product Details -->
+            <div class="row g-4 justify-content-evenly">
+                <!-- First Column: Order Summary -->
                 <div class="col-lg-5">
-                    <h4 class="section-title text-success">Product Details</h4>
-                    <div class="card product-details-card shadow-sm border-0">
+                    <h4 class="section-title">Order Summary</h4>
+                    <div class="order-summary">
                         <?php
                         if (!isset($_GET['product_id'])) {
                             echo "<p class='text-danger'>Product not found. Please go back and select a product.</p>";
@@ -88,29 +82,34 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
                         if ($row = mysqli_fetch_assoc($result)) {
                             $productName = htmlspecialchars($row['name']);
-                            $productPriceRaw = $row['price']; // Get the raw price value from the database
-                            $productPriceFormatted = number_format($productPriceRaw, 2); // Format for display
+                            $productPriceRaw = $row['price'];
+                            $productPriceFormatted = number_format($productPriceRaw, 2);
                             $productCategory = htmlspecialchars($row['category']);
                             $productImage = htmlspecialchars($row['image']);
-                        ?>
-                            <img src="../assets/products/<?php echo $productImage; ?>" alt="<?php echo $productName; ?>" class="img-fluid rounded-top">
-                            <div class="card-body">
-                                <h5 class="product-name text-primary fw-bold"><?php echo $productName; ?></h5>
-                                <p class="product-category text-muted"><strong>Category:</strong> <?php echo $productCategory; ?></p>
-                                <p class="product-price text-success">
-                                    <strong>Price:</strong> ₱<span id="base-price"><?php echo $productPriceRaw; ?></span>
-                                </p>
-                                <!-- Quantity Selector -->
-                                <div class="quantity-selector mt-4">
-                                    <label for="quantity" class="form-label fw-semibold">Quantity</label>
-                                    <div class="input-group">
-                                        <button class="btn btn-outline-secondary decrease-quantity" type="button">-</button>
-                                        <input type="number" id="quantity" class="form-control text-center" value="1" min="1">
-                                        <button class="btn btn-outline-secondary increase-quantity" type="button">+</button>
+                            $productDescription = htmlspecialchars($row['description']);
+                            ?>
+                            <div class="product-details d-flex align-items-center gap-3">
+                                <img src="../assets/products/<?php echo $productImage; ?>" alt="<?php echo $productName; ?>" class="product-image">
+                                <div class="product-info flex-grow-1">
+                                    <h5 class="product-name"><?php echo $productName; ?></h5>
+                                    <p class="product-description">Category: <?php echo $productCategory; ?></p>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <p class="product-price">₱<span id="base-price"><?php echo $productPriceRaw; ?></span></p>
+                                        <div class="quantity-selector d-flex align-items-center gap-2">
+                                            <button id="decrease-quantity" class="btn btn-sm btn-outline-secondary">-</button>
+                                            <input type="number" id="quantity" class="form-control quantity-input" value="1" min="1">
+                                            <button id="increase-quantity" class="btn btn-sm btn-outline-secondary">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        <?php
+                            <!-- Additional order summary details -->
+                            <div class="order-details mt-4">
+                                <p class="product-description"><?php echo $productDescription; ?></p>
+                            </div>
+                            <!-- Hidden input to store the base price for JavaScript -->
+                            <input type="hidden" id="product-price" value="<?php echo $productPriceRaw; ?>">
+                            <?php
                         } else {
                             echo "<p class='text-danger'>Product not found. Please go back and select a product.</p>";
                             exit();
@@ -121,47 +120,19 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
 
                 <!-- Second Column: Customer Details -->
                 <div class="col-lg-6">
-                    <h4 class="section-title text-success">Customer Details</h4>
-                    <div id="customer-details" class="card customer-details-card shadow-sm border-0">
-                        <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Full Name</label>
-                                    <input type="text" class="form-control bg-light" value="Loading..." readonly>
-                                </div>a
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Contact Number</label>
-                                    <input type="text" class="form-control bg-light" value="Loading..." readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Shipping Address</label>
-                                    <input type="text" class="form-control bg-light" value="Loading..." readonly>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-semibold">Mode of Payment</label>
-                                    <select id="payment-method" class="form-select bg-light">
-                                        <option value="gcash">GCash</option>
-                                        <option value="paymaya">Paymaya</option>
-                                        <option value="paypal">PayPal</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="action-buttons mt-4 d-flex gap-3">
-                                    <button class="btn btn-success w-50 btn-add-to-cart" data-product-id="<?php echo $product_id; ?>">
-                                        <i class="bi bi-cart-plus"></i> Add to Cart
-                                    </button>
-                                    <button class="btn btn-primary w-50 btn-checkout" data-product-id="<?php echo $product_id; ?>">
-                                        <i class="bi bi-credit-card"></i> Check Out
-                                    </button>
-                                </div>
-                        </div>
+                    <h4 class="section-title">Customer Details</h4>
+                    <div id="customer-details" class="customer-details">
+                        <!-- Initially empty, will be populated by JavaScript -->
+                         
                     </div>
                 </div>
             </div>
         </section>
     </main>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/profile-dropdown.js"></script>
     <script src="../assets/js/account-activation.js"></script>
+    <script src="../functions/JS/checkout.js"></script>
 </body>
-
 </html>
