@@ -401,6 +401,23 @@ section h4::after {
     color: #333;
 }
 
+
+.cart-count {
+    position: absolute;
+    top: -2px; /* Move the indicator higher above the cart icon */
+    left: 20px; /* Align it horizontally with the cart icon */
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
     .sidebar {

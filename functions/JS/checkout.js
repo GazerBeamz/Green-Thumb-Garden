@@ -1,164 +1,258 @@
 // Sidebar toggle for mobile
-const hamburger = document.querySelector('.hamburger');
-const sidebar = document.querySelector('.sidebar');
-hamburger.addEventListener('click', () => {
-    sidebar.classList.toggle('active');
+const hamburger = document.querySelector(".hamburger");
+const sidebar = document.querySelector(".sidebar");
+hamburger.addEventListener("click", () => {
+  sidebar.classList.toggle("active");
 });
 
-// Fetch customer details and other logic
+// Fetch customer details and handle quantity/add-to-cart/checkout logic
 document.addEventListener("DOMContentLoaded", () => {
-    const customerDetailsContainer = document.getElementById("customer-details");
+  const quantityInput = document.getElementById("quantity");
+  const basePrice = parseFloat(document.getElementById("product-price").value);
+  const productId = parseInt(document.getElementById("product-id").value);
+  const totalPriceElement = document.getElementById("total-price");
+  const MAX_QUANTITY = 10; // Hardcoded maximum quantity
 
-    // Get the base price from the hidden input
-    const basePrice = parseFloat(document.getElementById("product-price").value);
-    const quantityInput = document.getElementById("quantity");
+  // Update total price based on quantity
+  const updateTotalPrice = () => {
+    const quantity = parseInt(quantityInput.value) || 1; // Default to 1 if NaN
+    const updatedPrice = (basePrice * quantity).toFixed(2);
+    totalPriceElement.textContent = updatedPrice;
+    console.log(`Updated total price to: ₱${updatedPrice}`);
+  };
 
-    let totalPriceElement; // Declare here, will be assigned after fetch
-
-    const updateTotalPrice = () => {
-        const quantity = parseInt(quantityInput.value);
-        const updatedPrice = (basePrice * quantity).toFixed(2);
-        if (totalPriceElement) {
-            totalPriceElement.textContent = updatedPrice; // Update only the total price
-        }
-    };
-
-    // Fetch customer details
-    fetch("../functions/PHP/fetch_customer_details.php")
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then((data) => {
-            if (data.status === "success") {
-                const initialPrice = (basePrice * parseInt(quantityInput.value)).toFixed(2);
-                customerDetailsContainer.innerHTML = `
-                  <div class="card-body">
-                    <div class="mb-3 text-start d-flex align-items-center">
-                      <label class="form-label me-3" style="width: 150px;">Full Name</label>
-                      <input type="text" class="form-control" value="${data.fullname}" readonly>
-                    </div>
-                    <div class="mb-3 d-flex align-items-center">
-                      <label class="form-label me-3" style="width: 150px;">Contact Number</label>
-                      <input type="text" class="form-control" value="${data.contact}" readonly>
-                    </div>
-                    <div class="mb-3 d-flex align-items-center">
-                      <label class="form-label me-3" style="width: 150px;">Shipping Address</label>
-                      <input type="text" class="form-control" value="${data.address}" readonly>
-                    </div>
-                    <div class="mb-3 d-flex align-items-center">
-                      <label class="form-label me-3" style="width: 150px;">Mode of Payment</label>
-                      <select id="payment-method" class="form-select">
-                        <option value="">Select payment method</option>
-                        <option value="cod">Cash on Delivery</option>
-                        <option value="paypal">PayPal</option>
-                      </select>
-                    </div>
-                    <div class="total-section mt-4">
-                      <p class="total-text">Total: <span class="total-amount">₱<span id="total-price">${initialPrice}</span></span></p>
-                    </div>
-                    <div class="action-buttons mt-4 d-flex gap-3">
-                      <button class="btn btn-add-to-cart w-50" data-product-id="${data.product_id}">
-                        <i class="bi bi-cart-plus"></i> Add to Cart
-                      </button>
-                      <button class="btn btn-checkout w-50" data-product-id="${data.product_id}">
-                        <i class="bi bi-credit-card"></i> Checkout
-                      </button>
-                    </div>
-                  </div>
-                `;
-                // Assign totalPriceElement after the DOM is updated
-                totalPriceElement = document.getElementById("total-price");
-                attachButtonListeners();
-                updateTotalPrice(); // Ensure the price is updated after DOM changes
-            } else {
-                customerDetailsContainer.innerHTML = `<p>${data.message}</p>`;
-            }
-        })
-        .catch((error) => {
-            console.error("Error fetching customer details:", error);
-            customerDetailsContainer.innerHTML = `<p>An error occurred while fetching customer details.</p>`;
-        });
-
-    function attachButtonListeners() {
-        const addToCartButton = document.querySelector(".btn-add-to-cart");
-        const checkoutButton = document.querySelector(".btn-checkout");
-
-        if (addToCartButton) {
-            addToCartButton.addEventListener("click", (e) => {
-                const productId = e.target.getAttribute("data-product-id");
-                Swal.fire({
-                    icon: "success",
-                    title: "Added to Cart",
-                    text: "The product has been added to your cart!",
-                    showConfirmButton: false,
-                    timer: 1500,
-                });
-            });
-        }
-
-        if (checkoutButton) {
-            checkoutButton.addEventListener("click", (e) => {
-                const productId = e.target.getAttribute("data-product-id");
-                const paymentMethod = document.getElementById("payment-method").value;
-
-                Swal.fire({
-                    icon: "success",
-                    title: "Checkout Initiated",
-                    text: `Proceeding to checkout with ${paymentMethod}...`,
-                    showConfirmButton: false,
-                    timer: 1500,
-                });
-            });
-        }
-    }
-
-    setInterval(() => {
-        fetch("../check_session.php")
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.session_status === "inactive") {
-                    Swal.fire({
-                        icon: "warning",
-                        title: "Session Ended",
-                        text: "Your session has ended. Please log in again.",
-                        showConfirmButton: false,
-                        timer: 2000,
-                    }).then(() => {
-                        window.location.href = "../login.php?message=Session Ended";
-                    });
-                }
-            })
-            .catch((error) => console.error("Error checking session:", error));
-    }, 5000);
-
+  // Setup quantity buttons
+  const setupQuantityButtons = () => {
     const increaseButton = document.getElementById("increase-quantity");
     const decreaseButton = document.getElementById("decrease-quantity");
 
-    increaseButton.addEventListener("click", () => {
-        let currentValue = parseInt(quantityInput.value);
-        quantityInput.value = currentValue + 1;
-        updateTotalPrice();
-    });
+    if (
+      increaseButton &&
+      decreaseButton &&
+      quantityInput &&
+      totalPriceElement
+    ) {
+      // Increase quantity
+      increaseButton.addEventListener("click", () => {
+        let currentValue = parseInt(quantityInput.value) || 1;
+        console.log(
+          `Increase button clicked. Current value: ${currentValue}, Max value: ${MAX_QUANTITY}`
+        );
 
-    decreaseButton.addEventListener("click", () => {
-        let currentValue = parseInt(quantityInput.value);
-        if (currentValue > 1) {
-            quantityInput.value = currentValue - 1;
-            updateTotalPrice();
+        currentValue += 1; // Increment first
+        if (currentValue <= MAX_QUANTITY) {
+          quantityInput.value = currentValue;
+        } else {
+          quantityInput.value = MAX_QUANTITY; // Cap at 30
+          Swal.fire({
+            icon: "warning",
+            title: "Stock Limit",
+            text: `Maximum stock limit reached ${MAX_QUANTITY}`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
         }
-    });
+        updateTotalPrice();
+      });
 
-    quantityInput.addEventListener("input", () => {
-        let currentValue = parseInt(quantityInput.value);
-        if (isNaN(currentValue) || currentValue < 1) {
-            quantityInput.value = 1;
+      // Decrease quantity
+      decreaseButton.addEventListener("click", () => {
+        let currentValue = parseInt(quantityInput.value) || 1;
+        console.log(`Decrease button clicked. Current value: ${currentValue}`);
+
+        currentValue -= 1; // Decrement first
+        if (currentValue >= 1) {
+          quantityInput.value = currentValue;
+        } else {
+          quantityInput.value = 1; // Ensure it doesn't go below 1
         }
         updateTotalPrice();
+      });
+    } else {
+      console.error("Required elements for quantity buttons not found!");
+    }
+  };
+
+  // Attach button listeners for add-to-cart and checkout
+  const attachButtonListeners = () => {
+    const addToCartButton = document.querySelector(".btn-add-to-cart");
+    const checkoutButton = document.querySelector(".btn-checkout");
+
+    if (addToCartButton) {
+      addToCartButton.addEventListener("click", () => {
+        const quantity = parseInt(quantityInput.value);
+        if (isNaN(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Quantity",
+            text: `Please select a valid quantity (1-${MAX_QUANTITY}).`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          return;
+        }
+
+        // Prepare data
+        const productId = document.getElementById("product-id").value;
+        const productName = document.querySelector(".product-name").textContent;
+        const productDescription = document.querySelector(".order-details .product-description").textContent;
+        const productCategory = document.getElementById("product-category").value; // Now defined in HTML
+        const productPrice = document.getElementById("product-price").value;
+
+        // Validate all fields
+        if (!productId || !productName || !productCategory || !productPrice) {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Missing product details.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          return;
+        }
+
+        // AJAX Request
+        fetch("../functions/PHP/insert_cart.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: productId,
+            product_name: productName,
+            product_description: productDescription,
+            product_category: productCategory,
+            product_price: productPrice,
+            quantity: quantity,
+          }),
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error(`HTTP error! status: ${res.status}`);
+            }
+            return res.text(); // Get raw response first
+          })
+          .then((text) => {
+            try {
+              const data = JSON.parse(text);
+              console.log("Response from server:", data); // Debugging log
+              if (data.success) {
+                Swal.fire({
+                  icon: "success",
+                  title: "Added to Cart",
+                  text: `Added ${quantity} item(s) to cart.`,
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Error",
+                  text: data.message || "Something went wrong.",
+                });
+              }
+            } catch (e) {
+              console.error("Invalid JSON response:", text);
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Invalid response from server. Check console for details.",
+              });
+            }
+          })
+          .catch((error) => {
+            console.error("Error adding to cart:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Failed to add product to cart.",
+            });
+          });
+      });
+    }
+
+    if (checkoutButton) {
+      checkoutButton.addEventListener("click", () => {
+        const paymentMethod = document.getElementById("payment-method").value;
+        if (!paymentMethod) {
+          Swal.fire({
+            icon: "error",
+            title: "Payment Method Required",
+            text: "Please select a payment method.",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          return;
+        }
+        Swal.fire({
+          icon: "success",
+          title: "Checkout Initiated",
+          text: `Proceeding to checkout with ${paymentMethod}...`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      });
+    }
+  };
+
+  // Fetch customer details and update input fields
+  fetch("../functions/PHP/fetch_customer_details.php")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (data.status === "success") {
+        document.getElementById("fullname-input").value =
+          data.fullname || "Not provided";
+        document.getElementById("contact-input").value =
+          data.contact || "Not provided";
+        document.getElementById("address-input").value =
+          data.address || "Not provided";
+        console.log("Customer details updated successfully.");
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: data.message,
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching customer details:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to load customer details. Using default values.",
+        showConfirmButton: false,
+        timer: 2000,
+      });
     });
 
-    // Initial update for the total price in the Customer Details section
-    updateTotalPrice();
+  // Session check
+  setInterval(() => {
+    fetch("../check_session.php")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.session_status === "inactive") {
+          Swal.fire({
+            icon: "warning",
+            title: "Session Ended",
+            text: "Your session has ended. Please log in again.",
+            showConfirmButton: false,
+            timer: 2000,
+          }).then(() => {
+            window.location.href = "../login.php?message=Session Ended";
+          });
+        }
+      })
+      .catch((error) => console.error("Error checking session:", error));
+  }, 5000);
+
+  // Initialize
+  setupQuantityButtons();
+  attachButtonListeners();
+  updateTotalPrice(); // Initialize total price on load
 });

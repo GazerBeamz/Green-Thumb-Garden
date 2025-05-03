@@ -37,7 +37,10 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
             <span class="logo-text">Green Thumb</span>
         </div>
         <a href="customer_dashboard.php"><i class="bi bi-house-door"></i> Dashboard</a>
-        <a href="#orders.php"><i class="bi bi-cart"></i> My Orders</a>
+        <a href="add_to_cart.php" class="cart-link position-relative">
+            <i class="bi bi-cart"></i> My Cart
+            <span class="cart-count badge rounded-pill bg-danger">0</span>
+        </a>
         <a href="#gardening_tips.php"><i class="bi bi-flower1"></i> Gardening Tips</a>
     </nav>
 
@@ -152,6 +155,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
     <!-- <script src="../assets/js/filter-products.js"></script> -->
     <script src="../assets/js/profile-dropdown.js"></script>
     <script src="../assets/js/account-activation.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 
 <script>
@@ -180,16 +184,16 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
     });
     // check the session
     setInterval(() => {
-            fetch('../check_session.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.session_status === 'inactive') {
-                        alert('Session Ended');
-                        window.location.href = '../login.php?message=Session Ended';
-                    }
-                })
-                .catch(error => console.error('Error checking session:', error));
-        }, 5000); // Check every 5 seconds
+        fetch('../check_session.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.session_status === 'inactive') {
+                    alert('Session Ended');
+                    window.location.href = '../login.php?message=Session Ended';
+                }
+            })
+            .catch(error => console.error('Error checking session:', error));
+    }, 5000); // Check every 5 seconds
 </script>
 
 </html>
