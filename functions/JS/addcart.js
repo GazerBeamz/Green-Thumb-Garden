@@ -15,10 +15,12 @@ document.addEventListener("DOMContentLoaded", () => {
                         populateCart(data.cart_items);
                         emptyCartMessage.style.display = "none";
                         cartSummary.style.display = "block";
+                        cartCountElement.textContent = data.cart_items.length; // Display the number of unique products
                     } else {
                         cartItemsContainer.innerHTML = "";
                         emptyCartMessage.style.display = "block";
                         cartSummary.style.display = "none";
+                        cartCountElement.textContent = "0"; // No products in the cart
                     }
                 } else {
                     console.error(data.message);
@@ -31,7 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const populateCart = (cartItems) => {
         cartItemsContainer.innerHTML = ""; // Clear existing items
         let total = 0;
-        let itemCount = 0;
 
         cartItems.forEach((item) => {
             const cartItem = document.createElement("div");
@@ -55,12 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             cartItemsContainer.appendChild(cartItem);
 
-            total += parseFloat(item.total);
-            itemCount += parseInt(item.quantity);
+            total += parseFloat(item.price) * parseInt(item.quantity);
         });
 
         cartTotalElement.textContent = total.toFixed(2);
-        cartCountElement.textContent = itemCount;
     };
 
     // Update cart total
@@ -115,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (data.status === "success") {
                         cartItem.remove();
                         updateCartTotal();
+                        fetchCartItems(); // Refresh the cart count after removing an item
                     } else {
                         console.error(data.message);
                     }
