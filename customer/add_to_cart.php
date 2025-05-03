@@ -1,10 +1,3 @@
-<?php
-// Placeholder for session check (to be implemented later with backend)
-$user_id = 1; // Mock user ID
-$fullname = "John Doe"; // Mock user name
-$profile_image = "profile-placeholder.png"; // Mock profile image
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -30,7 +23,7 @@ $profile_image = "profile-placeholder.png"; // Mock profile image
         <a href="customer_dashboard.php"><i class="bi bi-house-door"></i> Dashboard</a>
         <a href="add_to_cart.php" class="cart-link position-relative">
             <i class="bi bi-cart"></i> My Cart
-            <span class="cart-count badge rounded-pill bg-danger">2</span>
+            <span class="cart-count badge rounded-pill bg-danger">0</span>
         </a>
         <a href="#gardening_tips.php"><i class="bi bi-flower1"></i> Gardening Tips</a>
     </nav>
@@ -43,9 +36,16 @@ $profile_image = "profile-placeholder.png"; // Mock profile image
             <div id="cart-items">
                 <!-- Cart items will be dynamically populated here -->
             </div>
-            <div class="cart-summary">
+            <div id="empty-cart-message" class="text-center py-5" style="display: none;">
+                <img src="../assets/images/empty-cart.png" alt="Empty Cart" class="img-fluid mb-4" style="max-width: 200px;">
+                <h5>Your cart is empty!</h5>
+                <p class="text-muted">Looks like you haven't added anything to your cart yet.</p>
+                <a href="customer_dashboard.php" class="btn btn-success mt-3">
+                    <i class="bi bi-arrow-left"></i> Continue Shopping
+                </a>
+            </div>
+            <div class="cart-summary" style="display: none;">
                 <h5>Total: ₱<span id="cart-total">0.00</span></h5>
-                <button class="btn btn-proceed-checkout mt-3" disabled>Proceed to Checkout</button>
             </div>
         </section>
     </main>
