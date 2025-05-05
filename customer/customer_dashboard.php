@@ -1,6 +1,5 @@
 <?php
 require_once '../includes/db.php';
-
 // Check if user is logged in and has customer role
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
     header("Location: ../login.php");
@@ -154,6 +153,7 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- <script src="../assets/js/filter-products.js"></script> -->
     <script src="../assets/js/profile-dropdown.js"></script>
+    <script src="../functions/JS/cartcounter.js"></script>
     <script src="../assets/js/account-activation.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
@@ -195,5 +195,6 @@ $fullname = $user['firstname'] . ' ' . $user['lastname'];
             .catch(error => console.error('Error checking session:', error));
     }, 5000); // Check every 5 seconds
 </script>
+
 
 </html>

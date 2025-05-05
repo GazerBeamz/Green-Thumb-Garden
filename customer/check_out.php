@@ -167,7 +167,7 @@ if ($row = mysqli_fetch_assoc($result)) {
                                 <button class="btn btn-add-to-cart w-50" data-product-id="<?php echo $product_id; ?>">
                                     <i class="bi bi-cart-plus"></i> Add to Cart
                                 </button>
-                                <button class="btn btn-checkout w-50" data-user-id="<?php echo $user_id?>" data-product-id="<?php echo $product_id; ?>">
+                                <button class="btn btn-checkout w-50" data-user-id="<?php echo $user_id ?>" data-product-id="<?php echo $product_id; ?>">
                                     <i class="bi bi-credit-card"></i> Checkout
                                 </button>
                             </div>
@@ -179,8 +179,8 @@ if ($row = mysqli_fetch_assoc($result)) {
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../functions/JS/checkout.js"></script>
+    <script src="../functions/JS/cartcounter.js"></script>
     <script src="../assets/js/profile-dropdown.js"></script>
     <script src="../assets/js/account-activation.js"></script>
 </body>
-
 </html>

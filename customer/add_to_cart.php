@@ -1,3 +1,11 @@
+<?php
+require_once '../includes/db.php';
+// Check if user is logged in and has customer role
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'customer') {
+    header("Location: ../login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
